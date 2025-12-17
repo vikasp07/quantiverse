@@ -1,9 +1,11 @@
 # 🔧 Supabase Authentication Fix Guide
 
 ## Issue You Had
+
 **Error:** "Invalid login credentials" after closing and reopening the project
 
 **Root Causes:**
+
 1. ❌ Hardcoded credentials in JavaScript (security risk)
 2. ❌ No session persistence configuration
 3. ❌ Email verification requirement not clearly communicated
@@ -14,16 +16,19 @@
 ## ✅ What Was Fixed
 
 ### 1. **Environment Variables Setup**
+
 - Created `.env.local` file with Supabase credentials
 - Updated `supabaseClient.js` to use `import.meta.env` variables
 - Added validation to catch missing credentials at startup
 
 ### 2. **Session Persistence**
+
 - Enabled `persistSession: true` in Supabase client config
 - Added `autoRefreshToken: true` for automatic token refresh
 - This ensures your session survives page refreshes and project restarts
 
 ### 3. **Better Error Handling**
+
 - Added specific error messages for common issues:
   - Email not confirmed
   - Invalid credentials
@@ -31,6 +36,7 @@
 - Better user feedback in the signin form
 
 ### 4. **Improved AuthContext**
+
 - Added try-catch blocks for better error tracking
 - Proper session verification before navigation
 - Fallback to 'user' role if role fetch fails
@@ -40,6 +46,7 @@
 ## 🚀 Next Steps
 
 ### Step 1: Restart Your Development Server
+
 ```bash
 # In your MockInterview folder terminal
 npm run dev
@@ -63,13 +70,14 @@ The server will automatically read your new `.env.local` file.
 ---
 
 ### Step 3: Sign In
+
 Once email is verified:
 
 1. **Go to Sign In:** `http://localhost:5173/signin`
 2. **Enter credentials:**
    - Email: `test@example.com`
    - Password: `Test@123456`
-3. **Expected Result:** 
+3. **Expected Result:**
    - Should navigate to `/home` (or `/admin` if that user has admin role)
    - Session persists when you refresh page
    - Session persists when you close/reopen browser
@@ -90,7 +98,7 @@ Once email is verified:
 4. Open Console tab
 5. Run this command:
    localStorage.getItem('sb-eplfwexdnkcwqdcqbgqq-auth-token')
-   
+
 6. Should show a JSON object with access_token and refresh_token
 
 7. Try these actions:
@@ -111,17 +119,17 @@ Once email is verified:
 1. Email Not Verified
    ├─ Solution: Check your email for verification link
    └─ The green link says "Confirm your email"
-   
+
 2. Wrong Credentials
    ├─ Solution: Double-check email and password are correct
    ├─ Try signing up again with new credentials
    └─ Remember: password is case-sensitive
-   
+
 3. Environment Variables Not Loaded
    ├─ Solution: Restart dev server after .env.local changes
    ├─ Check that .env.local file exists in root folder
    └─ Run: npm run dev (NOT npm dev or npm start)
-   
+
 4. Browser Cache Issue
    ├─ Solution: Clear all cookies/cache for localhost:5173
    ├─ Open DevTools → Application → Storage → Clear site data
@@ -152,6 +160,7 @@ MockInterview/
 **Before Deploying to Production:**
 
 1. **Never commit `.env.local` to Git**
+
    ```
    Check .gitignore has:
    .env.local
@@ -159,6 +168,7 @@ MockInterview/
    ```
 
 2. **Use Vercel/Netlify Environment Variables**
+
    ```
    Instead of .env.local, set these in your hosting provider:
    - VITE_SUPABASE_URL
@@ -166,6 +176,7 @@ MockInterview/
    ```
 
 3. **Use Row-Level Security (RLS) in Supabase**
+
    ```
    All your tables should have RLS policies:
    - Users can only see their own data
@@ -208,7 +219,7 @@ Steps:
 3. Signin with those credentials
 4. You should see home page
 5. Refresh page (F5) → Should still be logged in
-6. Close browser → Reopen → Go to http://localhost:5173 
+6. Close browser → Reopen → Go to http://localhost:5173
 7. Should redirect to home (logged in)
 8. Click logout → Should go to signin
 9. Try signing in again → Should work
@@ -221,18 +232,21 @@ Steps:
 Check your browser console (F12 → Console) for error messages:
 
 1. **Missing env variables?**
+
    ```
    Error: "Missing Supabase environment variables. Check .env.local file"
    Solution: Verify .env.local exists in root folder with correct values
    ```
 
 2. **Network error 400?**
+
    ```
    Failed to load resource: the server responded with a status of 400
    Solution: Check Supabase URL is correct in .env.local
    ```
 
 3. **User not found after login?**
+
    ```
    Error: "Failed to retrieve user information"
    Solution: Wait 1-2 seconds after verification link, then try login
@@ -247,6 +261,6 @@ Check your browser console (F12 → Console) for error messages:
 
 ---
 
-**You're all set! 🎉** 
+**You're all set! 🎉**
 
 Now your authentication should work even after closing and reopening the project. Session persists across browser sessions thanks to the localStorage persistence we enabled.

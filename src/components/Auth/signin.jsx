@@ -199,7 +199,10 @@ const Signin = () => {
         return;
       }
 
-      const result = await signInUser({ email: trimmedEmail, password: trimmedPassword });
+      const result = await signInUser({
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
 
       if (result.success) {
         // ✅ Wait a moment for session to persist before navigation
@@ -243,9 +246,11 @@ const Signin = () => {
       } else {
         // ✅ Show user-friendly error messages
         const errMsg = result.error?.message || "Login failed";
-        
+
         if (errMsg.toLowerCase().includes("email not confirmed")) {
-          setToast("Email not confirmed. Check your inbox for verification link.");
+          setToast(
+            "Email not confirmed. Check your inbox for verification link."
+          );
           setTimeout(() => setToast(""), 4000);
         } else if (errMsg.toLowerCase().includes("invalid")) {
           setError("Invalid email or password. Please check your credentials.");

@@ -1,10 +1,25 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { fetchSimulations, fetchTasksForSimulation, updateTaskProgress, getTasksWithUserProgress } from '../utils/simulations';
-import { CheckCircle, PlayCircle, Briefcase, Check, AlertCircle, Upload, FileText, Clock, ArrowLeft } from 'lucide-react';
-import { useUser } from '@supabase/auth-helpers-react';
-import { supabase } from '../utils/supabaseClient';
-import WorkUpload from './WorkUpload';
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  fetchSimulations,
+  fetchTasksForSimulation,
+  updateTaskProgress,
+  getTasksWithUserProgress,
+} from "../utils/simulations";
+import {
+  CheckCircle,
+  PlayCircle,
+  Briefcase,
+  Check,
+  AlertCircle,
+  Upload,
+  FileText,
+  Clock,
+  ArrowLeft,
+} from "lucide-react";
+import { useUser } from "@supabase/auth-helpers-react";
+import { supabase } from "../utils/supabaseClient";
+import WorkUpload from "./WorkUpload";
 
 const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
   const navigate = useNavigate();
@@ -17,36 +32,38 @@ const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
       >
         <ArrowLeft className="text-blue-600 w-5 h-5" />
         <span className="text-lg font-semibold text-gray-800">
-          {simulation?.title?.split(':')[0] || 'Simulation'}
+          {simulation?.title?.split(":")[0] || "Simulation"}
         </span>
       </button>
 
       <div className="space-y-4">
         {tasks.map((task, index) => {
-          const isCompleted = task.status === 'completed';
+          const isCompleted = task.status === "completed";
           const isCurrent = index === currentTaskIndex;
-          const isInProgress = task.status === 'in_progress';
-          const isPending = task.confirmation_status === 'pending';
+          const isInProgress = task.status === "in_progress";
+          const isPending = task.confirmation_status === "pending";
 
           return (
             <button
               key={task.id}
-              onClick={() => navigate(`/internship/${simulationId}/task/${index + 1}`)}
+              onClick={() =>
+                navigate(`/internship/${simulationId}/task/${index + 1}`)
+              }
               className={`w-full text-left p-3 rounded-lg transition-all duration-150 flex items-start space-x-3 ${
                 isCurrent
-                  ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 font-semibold'
+                  ? "bg-blue-50 text-blue-700 border-l-4 border-blue-600 font-semibold"
                   : isCompleted
-                  ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                  : 'hover:bg-gray-100 text-gray-800'
+                  ? "bg-green-50 text-green-700 hover:bg-green-100"
+                  : "hover:bg-gray-100 text-gray-800"
               }`}
             >
               <div
                 className={`w-6 h-6 text-sm rounded-full flex items-center justify-center border ${
                   isCompleted
-                    ? 'bg-green-600 text-white border-green-600'
+                    ? "bg-green-600 text-white border-green-600"
                     : isCurrent || isInProgress
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-gray-400 text-gray-500'
+                    ? "border-blue-600 text-blue-600"
+                    : "border-gray-400 text-gray-500"
                 }`}
               >
                 {isCompleted ? <Check size={14} /> : index + 1}
@@ -57,7 +74,9 @@ const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
                   {task.duration} • {task.difficulty}
                 </p>
                 {isCompleted && (
-                  <p className="text-xs text-green-600 font-medium">✓ Completed</p>
+                  <p className="text-xs text-green-600 font-medium">
+                    ✓ Completed
+                  </p>
                 )}
               </div>
             </button>
@@ -68,27 +87,36 @@ const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
   );
 };
 
-
 const TaskOverview = ({ task }) => {
   // Normalize learn points: handle comma-separated string or array
-  const learnPoints = typeof task.what_youll_learn === 'string'
-    ? task.what_youll_learn.split(',').map((p) => p.trim()).filter(Boolean)
-    : Array.isArray(task.what_youll_learn)
-    ? task.what_youll_learn.filter(Boolean)
-    : [];
+  const learnPoints =
+    typeof task.what_youll_learn === "string"
+      ? task.what_youll_learn
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean)
+      : Array.isArray(task.what_youll_learn)
+      ? task.what_youll_learn.filter(Boolean)
+      : [];
 
   // Normalize do points: same as above
-  const doPoints = typeof task.what_youll_do === 'string'
-    ? task.what_youll_do.split(',').map((p) => p.trim()).filter(Boolean)
-    : Array.isArray(task.what_youll_do)
-    ? task.what_youll_do.filter(Boolean)
-    : [];
+  const doPoints =
+    typeof task.what_youll_do === "string"
+      ? task.what_youll_do
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean)
+      : Array.isArray(task.what_youll_do)
+      ? task.what_youll_do.filter(Boolean)
+      : [];
 
   return (
     <section className="grid md:grid-cols-2 gap-6">
       {/* What You'll Learn */}
       <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">What You'll Learn</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+          What You'll Learn
+        </h3>
         {learnPoints.length > 0 ? (
           <ul className="space-y-2 list-disc list-inside text-gray-700 text-sm">
             {learnPoints.map((point, i) => (
@@ -96,13 +124,17 @@ const TaskOverview = ({ task }) => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic text-sm">No learning objectives provided.</p>
+          <p className="text-gray-500 italic text-sm">
+            No learning objectives provided.
+          </p>
         )}
       </div>
 
       {/* What You'll Do */}
       <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">What You'll Do</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+          What You'll Do
+        </h3>
         {doPoints.length > 0 ? (
           <ul className="space-y-2 list-disc list-inside text-gray-700 text-sm">
             {doPoints.map((point, i) => (
@@ -110,7 +142,9 @@ const TaskOverview = ({ task }) => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic text-sm">No actions defined for this task.</p>
+          <p className="text-gray-500 italic text-sm">
+            No actions defined for this task.
+          </p>
         )}
       </div>
     </section>
@@ -124,7 +158,11 @@ const VideoMessage = ({ url }) => {
         <h3 className="text-lg font-semibold text-gray-800">Company Message</h3>
       </div>
       {url ? (
-        <video controls className="w-full rounded-lg" poster="/video-poster.jpg">
+        <video
+          controls
+          className="w-full rounded-lg"
+          poster="/video-poster.jpg"
+        >
           <source src={url} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -141,7 +179,6 @@ const SimulationTaskPage = () => {
   const { id, taskId } = useParams();
   const navigate = useNavigate();
   const hookUser = useUser();
-  
 
   const [currentUser, setCurrentUser] = useState(null);
   const [userLoaded, setUserLoaded] = useState(false);
@@ -152,165 +189,190 @@ const SimulationTaskPage = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
-        const { data: { user: authUser }, error } = await supabase.auth.getUser();
+        const {
+          data: { user: authUser },
+          error,
+        } = await supabase.auth.getUser();
         if (error) {
-          console.error('Auth error:', error);
+          console.error("Auth error:", error);
         }
-        
+
         const finalUser = hookUser || authUser;
         setCurrentUser(finalUser);
         setUserLoaded(true);
-        
-        console.log('Final user set:', finalUser);
-        console.log('Hook user:', hookUser);
-        console.log('Direct user:', authUser);
+
+        console.log("Final user set:", finalUser);
+        console.log("Hook user:", hookUser);
+        console.log("Direct user:", authUser);
       } catch (error) {
-        console.error('Error getting user:', error);
+        console.error("Error getting user:", error);
         setUserLoaded(true);
       }
     };
-    
+
     getCurrentUser();
   }, [hookUser]);
 
-  const loadTasksWithProgress = useCallback(async (simulationId) => {
-    try {
-      console.log('Loading tasks for simulation:', simulationId);
-      console.log('Current user for progress:', currentUser);
-      
-      const allTasks = await fetchTasksForSimulation(simulationId);
-      console.log('All tasks loaded:', allTasks);
+  const loadTasksWithProgress = useCallback(
+    async (simulationId) => {
+      try {
+        console.log("Loading tasks for simulation:", simulationId);
+        console.log("Current user for progress:", currentUser);
 
-      if (!currentUser) {
-        console.log('No user, returning tasks as not started');
-        return allTasks.map((task) => ({
-          ...task,
-          status: 'not_started',
-          confirmation_status: null,
-          updated_at: null,
-          uploaded_work_url: null,
-          comment: progress?.comment || null,
-        }));
-      }
+        const allTasks = await fetchTasksForSimulation(simulationId);
+        console.log("All tasks loaded:", allTasks);
 
-      console.log('Fetching progress for user:', currentUser.id);
-      const { data: progressData, error: progressError } = await supabase
-        .from("user_task_progress")
-        .select("task_id, status, updated_at, confirmation_status, uploaded_work_url,comment")
-        .eq("user_id", currentUser.id)
-        .eq("simulation_id", simulationId);
+        if (!currentUser) {
+          console.log("No user, returning tasks as not started");
+          return allTasks.map((task) => ({
+            ...task,
+            status: "not_started",
+            confirmation_status: null,
+            updated_at: null,
+            uploaded_work_url: null,
+            comment: progress?.comment || null,
+          }));
+        }
 
-      if (progressError) {
-        console.error("Progress fetch error:", progressError);
-        return allTasks.map((task) => ({
-          ...task,
-          status: 'not_started',
-          confirmation_status: null,
-          updated_at: null,
-          uploaded_work_url: null
-        }));
-      }
-
-      console.log('Progress data from DB:', progressData);
-
-      // Create a map for faster lookup
-      const progressMap = new Map();
-      if (progressData) {
-        progressData.forEach(progress => {
-          console.log(`Mapping task ${progress.task_id} with status ${progress.status}`);
-          progressMap.set(progress.task_id, progress);
-        });
-      }
-
-      // Map tasks with progress data
-      const tasksWithProgress = allTasks.map((task) => {
-        const progress = progressMap.get(task.id);
-        console.log(`Task ${task.id} mapped with progress:`, progress);
-        
-        return {
-          ...task,
-          status: progress?.status || 'not_started',
-          confirmation_status: progress?.confirmation_status || null,
-          uploaded_work_url: progress?.uploaded_work_url || null,
-          updated_at: progress?.updated_at || null,
-          comment: progress?.comment || null, 
-        };
-      });
-
-      console.log('Final tasks with progress:', tasksWithProgress);
-      return tasksWithProgress;
-
-    } catch (error) {
-      console.error("Error loading task progress:", error);
-      throw error;
-    }
-  }, [currentUser]);
-
-  const handleUpdateTaskProgress = useCallback(async (taskId, status) => {
-    if (!currentUser) {
-      setError('Please sign in to continue with the simulation.');
-      return false;
-    }
-
-    try {
-      const result = await updateTaskProgress(currentUser.id, id, taskId, status);
-      
-      if (result) {
-        // Update local state optimistically
-        setTasks(prevTasks => 
-          prevTasks.map(task => 
-            task.id === taskId 
-              ? { ...task, status: status, updated_at: new Date().toISOString() }
-              : task
+        console.log("Fetching progress for user:", currentUser.id);
+        const { data: progressData, error: progressError } = await supabase
+          .from("user_task_progress")
+          .select(
+            "task_id, status, updated_at, confirmation_status, uploaded_work_url,comment"
           )
-        );
-        return true;
-      } else {
-        throw new Error('Failed to update task progress');
+          .eq("user_id", currentUser.id)
+          .eq("simulation_id", simulationId);
+
+        if (progressError) {
+          console.error("Progress fetch error:", progressError);
+          return allTasks.map((task) => ({
+            ...task,
+            status: "not_started",
+            confirmation_status: null,
+            updated_at: null,
+            uploaded_work_url: null,
+          }));
+        }
+
+        console.log("Progress data from DB:", progressData);
+
+        // Create a map for faster lookup
+        const progressMap = new Map();
+        if (progressData) {
+          progressData.forEach((progress) => {
+            console.log(
+              `Mapping task ${progress.task_id} with status ${progress.status}`
+            );
+            progressMap.set(progress.task_id, progress);
+          });
+        }
+
+        // Map tasks with progress data
+        const tasksWithProgress = allTasks.map((task) => {
+          const progress = progressMap.get(task.id);
+          console.log(`Task ${task.id} mapped with progress:`, progress);
+
+          return {
+            ...task,
+            status: progress?.status || "not_started",
+            confirmation_status: progress?.confirmation_status || null,
+            uploaded_work_url: progress?.uploaded_work_url || null,
+            updated_at: progress?.updated_at || null,
+            comment: progress?.comment || null,
+          };
+        });
+
+        console.log("Final tasks with progress:", tasksWithProgress);
+        return tasksWithProgress;
+      } catch (error) {
+        console.error("Error loading task progress:", error);
+        throw error;
       }
-    } catch (error) {
-      setError(`Error updating progress: ${error.message || 'Unknown error'}`);
-      return false;
-    }
-  }, [currentUser, id]);
+    },
+    [currentUser]
+  );
+
+  const handleUpdateTaskProgress = useCallback(
+    async (taskId, status) => {
+      if (!currentUser) {
+        setError("Please sign in to continue with the simulation.");
+        return false;
+      }
+
+      try {
+        const result = await updateTaskProgress(
+          currentUser.id,
+          id,
+          taskId,
+          status
+        );
+
+        if (result) {
+          // Update local state optimistically
+          setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task.id === taskId
+                ? {
+                    ...task,
+                    status: status,
+                    updated_at: new Date().toISOString(),
+                  }
+                : task
+            )
+          );
+          return true;
+        } else {
+          throw new Error("Failed to update task progress");
+        }
+      } catch (error) {
+        setError(
+          `Error updating progress: ${error.message || "Unknown error"}`
+        );
+        return false;
+      }
+    },
+    [currentUser, id]
+  );
 
   // Handle successful upload
-  const handleUploadSuccess = useCallback((uploadUrl) => {
-    const taskIndex = parseInt(taskId) - 1;
-    const currentTask = tasks[taskIndex];
-    
-    if (!currentTask) {
-      console.error('Current task not found for index:', taskIndex);
-      return;
-    }
+  const handleUploadSuccess = useCallback(
+    (uploadUrl) => {
+      const taskIndex = parseInt(taskId) - 1;
+      const currentTask = tasks[taskIndex];
 
-    console.log('Updating task after upload:', {
-      taskId: currentTask.id,
-      uploadUrl,
-      status: 'completed'
-    });
+      if (!currentTask) {
+        console.error("Current task not found for index:", taskIndex);
+        return;
+      }
 
-    setTasks(prevTasks => 
-      prevTasks.map((task) => 
-        task.id === currentTask.id
-          ? { 
-              ...task, 
-              status: 'completed',
-              confirmation_status: 'pending',
-              uploaded_work_url: uploadUrl,
-              updated_at: new Date().toISOString(),
-              comment:null,
-            } 
-          : task
-      )
-    );
-    
-    setError(null);
-  }, [taskId, tasks]);
+      console.log("Updating task after upload:", {
+        taskId: currentTask.id,
+        uploadUrl,
+        status: "completed",
+      });
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === currentTask.id
+            ? {
+                ...task,
+                status: "completed",
+                confirmation_status: "pending",
+                uploaded_work_url: uploadUrl,
+                updated_at: new Date().toISOString(),
+                comment: null,
+              }
+            : task
+        )
+      );
+
+      setError(null);
+    },
+    [taskId, tasks]
+  );
 
   // Main data loading effect - now waits for userLoaded
   useEffect(() => {
@@ -318,15 +380,15 @@ const SimulationTaskPage = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const sims = await fetchSimulations();
         const sim = sims.find((s) => s.id === id);
-        
+
         if (!sim) {
-          setError('Simulation not found.');
+          setError("Simulation not found.");
           return;
         }
-        
+
         setSimulation(sim);
 
         // Load tasks with user progress
@@ -337,13 +399,15 @@ const SimulationTaskPage = () => {
         if (currentUser && tasksWithProgress.length > 0) {
           const currentTaskIndex = parseInt(taskId) - 1;
           const currentTask = tasksWithProgress[currentTaskIndex];
-          
-          if (currentTask && currentTask.status === 'not_started') {
-            handleUpdateTaskProgress(currentTask.id, 'in_progress').catch(console.error);
+
+          if (currentTask && currentTask.status === "not_started") {
+            handleUpdateTaskProgress(currentTask.id, "in_progress").catch(
+              console.error
+            );
           }
         }
       } catch (error) {
-        setError('Failed to load simulation. Please refresh the page.');
+        setError("Failed to load simulation. Please refresh the page.");
       } finally {
         setLoading(false);
       }
@@ -353,7 +417,14 @@ const SimulationTaskPage = () => {
     if (userLoaded) {
       loadSimulation();
     }
-  }, [id, taskId, currentUser, userLoaded, loadTasksWithProgress, handleUpdateTaskProgress]);
+  }, [
+    id,
+    taskId,
+    currentUser,
+    userLoaded,
+    loadTasksWithProgress,
+    handleUpdateTaskProgress,
+  ]);
 
   // Show error state
   if (error) {
@@ -361,7 +432,9 @@ const SimulationTaskPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Something went wrong
+          </h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -396,8 +469,12 @@ const SimulationTaskPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Task not found</h2>
-          <p className="text-gray-600 mb-6">The requested task could not be found.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Task not found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            The requested task could not be found.
+          </p>
           <button
             onClick={() => navigate(`/internship/${id}`)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -425,11 +502,11 @@ const SimulationTaskPage = () => {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      <TaskStepper 
+      <TaskStepper
         key={simulation?.id}
-        tasks={tasks} 
-        currentTaskIndex={currentTaskIndex} 
-        simulationId={id} 
+        tasks={tasks}
+        currentTaskIndex={currentTaskIndex}
+        simulationId={id}
         simulation={simulation}
       />
 
@@ -444,7 +521,9 @@ const SimulationTaskPage = () => {
 
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{currentTask.title}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+              {currentTask.title}
+            </h1>
             {/* {currentTask.status === 'completed' && (
               <div className="flex items-center gap-2 text-green-600 font-medium mt-1">
                 <Check size={16} />
@@ -476,45 +555,45 @@ const SimulationTaskPage = () => {
               </div>
             )} */}
 
-            {currentTask.status === 'completed' && (
-  <>
-    <div className="flex items-center gap-2 text-green-600 font-medium mt-1">
-      <Check size={16} />
-      <span className="text-sm">Task Completed</span>
-      {currentTask.confirmation_status === 'pending' && (
-        <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full ml-2">
-          Pending Review
-        </span>
-      )}
-      {currentTask.confirmation_status === 'accepted' && (
-        <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full ml-2">
-          Accepted
-        </span>
-      )}
-      {currentTask.confirmation_status === 'rejected' && (
-        <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded-full ml-2">
-          Rejected
-        </span>
-      )}
-    </div>
+            {currentTask.status === "completed" && (
+              <>
+                <div className="flex items-center gap-2 text-green-600 font-medium mt-1">
+                  <Check size={16} />
+                  <span className="text-sm">Task Completed</span>
+                  {currentTask.confirmation_status === "pending" && (
+                    <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full ml-2">
+                      Pending Review
+                    </span>
+                  )}
+                  {currentTask.confirmation_status === "accepted" && (
+                    <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full ml-2">
+                      Accepted
+                    </span>
+                  )}
+                  {currentTask.confirmation_status === "rejected" && (
+                    <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded-full ml-2">
+                      Rejected
+                    </span>
+                  )}
+                </div>
 
-    {(currentTask.confirmation_status === 'rejected' || currentTask.confirmation_status === 'accepted') &&
-      currentTask.comment && (
-        <p className="text-sm text-gray-700 mt-2 italic">
-          Feedback: {currentTask.comment}
-        </p>
-    )}
-  </>
-)}
-
+                {(currentTask.confirmation_status === "rejected" ||
+                  currentTask.confirmation_status === "accepted") &&
+                  currentTask.comment && (
+                    <p className="text-sm text-gray-700 mt-2 italic">
+                      Feedback: {currentTask.comment}
+                    </p>
+                  )}
+              </>
+            )}
           </div>
 
           {currentTask.material_url && (
             <button
               onClick={() => {
-                const link = document.createElement('a');
+                const link = document.createElement("a");
                 link.href = currentTask.material_url;
-                link.download = '';
+                link.download = "";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -529,10 +608,9 @@ const SimulationTaskPage = () => {
         <TaskOverview task={currentTask} />
         <VideoMessage url={currentTask.videoUrl} />
 
-
         {/* Work Upload Section */}
-        <WorkUpload 
-          task={currentTask} 
+        <WorkUpload
+          task={currentTask}
           onUploadSuccess={handleUploadSuccess}
           isUploading={isUploading}
           setIsUploading={setIsUploading}
@@ -541,14 +619,16 @@ const SimulationTaskPage = () => {
 
         {/* Navigation buttons */}
         <div className="pt-4 flex gap-3">
-          {currentTask.status === 'completed' ? (
+          {currentTask.status === "completed" ? (
             <button
               onClick={handleProceedToNext}
               disabled={isCompleting}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg shadow transition-all font-semibold text-sm bg-green-600 hover:bg-green-700 text-white"
             >
               <Check size={18} />
-              {isLastTask ? 'Complete Simulation' : `Next: ${nextTask?.title || 'Continue'}`}
+              {isLastTask
+                ? "Complete Simulation"
+                : `Next: ${nextTask?.title || "Continue"}`}
             </button>
           ) : (
             nextTask && (
@@ -561,7 +641,6 @@ const SimulationTaskPage = () => {
             )
           )}
         </div>
-
       </main>
     </div>
   );

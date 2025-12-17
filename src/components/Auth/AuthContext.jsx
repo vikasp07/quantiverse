@@ -5,8 +5,8 @@ const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(null); // ✅ default is null not "Hey"
-  
-  const [loading, setLoading] = useState(true); 
+
+  const [loading, setLoading] = useState(true);
 
   const signUpNewUser = async (email, password, fullName, phoneNo) => {
     const { data, error } = await supabase.auth.signUp({
@@ -48,28 +48,30 @@ export const AuthContextProvider = ({ children }) => {
 
       if (error) {
         console.error("Sign-in error: ", error);
-        
+
         // ✅ Better error messaging for common issues
         if (error.message.includes("Invalid login credentials")) {
           return {
             success: false,
             error: {
               ...error,
-              message: "Invalid email or password. Please check your credentials.",
+              message:
+                "Invalid email or password. Please check your credentials.",
             },
           };
         }
-        
+
         if (error.message.includes("Email not confirmed")) {
           return {
             success: false,
             error: {
               ...error,
-              message: "Please confirm your email before logging in. Check your inbox.",
+              message:
+                "Please confirm your email before logging in. Check your inbox.",
             },
           };
         }
-        
+
         return { success: false, error };
       }
 
@@ -110,8 +112,7 @@ export const AuthContextProvider = ({ children }) => {
   //   });
   // }, []);
 
-
-   useEffect(() => {
+  useEffect(() => {
     const getSession = async () => {
       const {
         data: { session },
@@ -137,7 +138,9 @@ export const AuthContextProvider = ({ children }) => {
     // <AuthContext.Provider
     //   value={{ session, signInUser, signUpNewUser, signOut }}
     // >
-    <AuthContext.Provider value={{ session, signInUser, signUpNewUser, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ session, signInUser, signUpNewUser, signOut, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

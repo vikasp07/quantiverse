@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Clock,
@@ -8,20 +8,23 @@ import {
   CheckCircle,
   BookOpen,
   Target,
-  Star
-} from 'lucide-react';
-import axios from 'axios';
+  Star,
+} from "lucide-react";
+import axios from "axios";
 
-import { fetchSimulations, fetchTasksForSimulation } from '../utils/simulations';
-import HowItWorksSection from './HowItWorksSection';
-import { useUser } from '@supabase/auth-helpers-react';
-import { supabase } from '../utils/supabaseClient';
+import {
+  fetchSimulations,
+  fetchTasksForSimulation,
+} from "../utils/simulations";
+import HowItWorksSection from "./HowItWorksSection";
+import { useUser } from "@supabase/auth-helpers-react";
+import { supabase } from "../utils/supabaseClient";
 
 const SimulationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hookUser = useUser();
-  
+
   const [simulation, setSimulation] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(1);
@@ -37,20 +40,23 @@ const SimulationDetail = () => {
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
-        const { data: { user: authUser }, error } = await supabase.auth.getUser();
+        const {
+          data: { user: authUser },
+          error,
+        } = await supabase.auth.getUser();
         if (error) {
-          console.error('Auth error:', error);
+          console.error("Auth error:", error);
         }
-        
+
         const finalUser = hookUser || authUser;
         setCurrentUser(finalUser);
         setUserLoaded(true);
       } catch (error) {
-        console.error('Error getting user:', error);
+        console.error("Error getting user:", error);
         setUserLoaded(true);
       }
     };
-    
+
     getCurrentUser();
   }, [hookUser]);
 
@@ -65,14 +71,14 @@ const SimulationDetail = () => {
 
       try {
         const { data: progressData, error } = await supabase
-          .from('user_task_progress')
-          .select('task_id, status')
-          .eq('user_id', currentUser.id)
-          .eq('simulation_id', simulation.id)
-          .order('task_id', { ascending: true });
+          .from("user_task_progress")
+          .select("task_id, status")
+          .eq("user_id", currentUser.id)
+          .eq("simulation_id", simulation.id)
+          .order("task_id", { ascending: true });
 
         if (error) {
-          console.error('Error fetching user progress:', error);
+          console.error("Error fetching user progress:", error);
           setHasStarted(false);
           setNextTaskNumber(1);
           return;
@@ -80,37 +86,39 @@ const SimulationDetail = () => {
 
         if (progressData && progressData.length > 0) {
           setHasStarted(true);
-          
+
           // Find the next incomplete task
-          const progressMap = new Map(progressData.map(p => [p.task_id, p.status]));
+          const progressMap = new Map(
+            progressData.map((p) => [p.task_id, p.status])
+          );
           let nextTask = 1;
-          
+
           for (let i = 0; i < tasks.length; i++) {
             const task = tasks[i];
             const status = progressMap.get(task.id);
-            
-            if (!status || status === 'not_started') {
+
+            if (!status || status === "not_started") {
               nextTask = i + 1;
               break;
-            } else if (status === 'in_progress') {
+            } else if (status === "in_progress") {
               nextTask = i + 1;
               break;
-            } else if (status === 'completed' && i === tasks.length - 1) {
+            } else if (status === "completed" && i === tasks.length - 1) {
               // All tasks completed
               nextTask = tasks.length;
               break;
-            } else if (status === 'completed') {
+            } else if (status === "completed") {
               nextTask = i + 2; // Next task after completed one
             }
           }
-          
+
           setNextTaskNumber(nextTask);
         } else {
           setHasStarted(false);
           setNextTaskNumber(1);
         }
       } catch (error) {
-        console.error('Error checking user progress:', error);
+        console.error("Error checking user progress:", error);
         setHasStarted(false);
         setNextTaskNumber(1);
       }
@@ -193,16 +201,18 @@ const SimulationDetail = () => {
   };
 
   const getButtonText = () => {
-    if (isLoading) return 'Loading...';
-    if (!currentUser) return 'Start Free Program';
-    if (hasStarted) return 'Continue Program';
-    return 'Start Free Program';
+    if (isLoading) return "Loading...";
+    if (!currentUser) return "Start Free Program";
+    if (hasStarted) return "Continue Program";
+    return "Start Free Program";
   };
 
   const getButtonDescription = () => {
-    if (!currentUser) return 'Complete work that simulates real job scenarios. Self-paced learning in just 3-4 hours.';
-    if (hasStarted) return `Continue from Task ${nextTaskNumber}. Pick up where you left off.`;
-    return 'Complete work that simulates real job scenarios. Self-paced learning in just 3-4 hours.';
+    if (!currentUser)
+      return "Complete work that simulates real job scenarios. Self-paced learning in just 3-4 hours.";
+    if (hasStarted)
+      return `Continue from Task ${nextTaskNumber}. Pick up where you left off.`;
+    return "Complete work that simulates real job scenarios. Self-paced learning in just 3-4 hours.";
   };
 
   if (!simulation) {
@@ -220,7 +230,7 @@ const SimulationDetail = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <button
-            onClick={() => navigate('/internship')}
+            onClick={() => navigate("/internship")}
             className="inline-flex items-center text-white/90 hover:text-white mb-8 transition-colors group"
           >
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
@@ -246,7 +256,7 @@ const SimulationDetail = () => {
                 </div>
                 <div className="flex items-center gap-2 text-blue-100">
                   <Star className="h-4 w-4 fill-current" />
-                  <span>{simulation.rating || '4.5'}</span>
+                  <span>{simulation.rating || "4.5"}</span>
                 </div>
               </div>
             </div>
@@ -255,7 +265,7 @@ const SimulationDetail = () => {
               <div className="flex flex-col space-y-1.5 p-6">
                 <h3 className="text-2xl font-semibold tracking-tight text-gray-900 flex items-center gap-2">
                   <Award className="h-5 w-5 text-blue-600" />
-                  {hasStarted ? 'Continue Learning' : 'Get Career Ready'}
+                  {hasStarted ? "Continue Learning" : "Get Career Ready"}
                 </h3>
               </div>
               <div className="p-6 pt-0 space-y-6">
@@ -269,7 +279,8 @@ const SimulationDetail = () => {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-1" />
                     <span className="text-sm text-gray-700">
-                      Stand out in your applications and show employers you're committed to learning.
+                      Stand out in your applications and show employers you're
+                      committed to learning.
                     </span>
                   </div>
                 </div>
@@ -309,7 +320,11 @@ const SimulationDetail = () => {
       <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8 py-4">
-            {['Overview', 'Tasks', ...(simulation.review > 0 ? ['Reviews'] : [])].map((tab) => (
+            {[
+              "Overview",
+              "Tasks",
+              ...(simulation.review > 0 ? ["Reviews"] : []),
+            ].map((tab) => (
               <a
                 key={tab}
                 href={`#${tab.toLowerCase()}`}
@@ -339,8 +354,11 @@ const SimulationDetail = () => {
                   {simulation.overview}
                 </p>
                 <div className="flex flex-wrap gap-3 mb-6">
-                  {simulation.features?.split(',').map((feature, index) => (
-                    <div key={index} className="border border-gray-300 text-gray-600 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                  {simulation.features?.split(",").map((feature, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-300 text-gray-600 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    >
                       {feature.trim()}
                     </div>
                   ))}
@@ -370,22 +388,24 @@ const SimulationDetail = () => {
                       onClick={() => setSelectedTask(task.id)}
                       className={`text-left p-6 rounded-xl border-2 transition-all ${
                         selectedTask === task.id
-                          ? 'border-blue-500 bg-blue-50 shadow-lg'
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                          ? "border-blue-500 bg-blue-50 shadow-lg"
+                          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
                       }`}
                     >
                       <div className="flex items-center gap-4">
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                             selectedTask === task.id
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-100 text-gray-600'
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-100 text-gray-600"
                           }`}
                         >
                           {taskNumber}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{task.title}</h3>
+                          <h3 className="font-semibold text-gray-900">
+                            {task.title}
+                          </h3>
                           <p className="text-sm text-gray-600 mt-1">
                             {task.duration} • {task.difficulty}
                           </p>
@@ -399,7 +419,9 @@ const SimulationDetail = () => {
               {/* Task Detail */}
               {currentTask && (
                 <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8">
-                  <h3 className="text-2xl font-bold mb-4">{currentTask.fullTitle}</h3>
+                  <h3 className="text-2xl font-bold mb-4">
+                    {currentTask.fullTitle}
+                  </h3>
                   <div className="flex items-center gap-4 text-sm text-blue-600 mb-6">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
@@ -422,12 +444,17 @@ const SimulationDetail = () => {
                         What you'll learn
                       </h4>
                       <ul className="space-y-3">
-                        {currentTask.what_youll_learn?.split(',').map((item, index) => (
-                          <li key={index} className="text-gray-700 flex items-start gap-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span>{item.trim()}</span>
-                          </li>
-                        ))}
+                        {currentTask.what_youll_learn
+                          ?.split(",")
+                          .map((item, index) => (
+                            <li
+                              key={index}
+                              className="text-gray-700 flex items-start gap-3"
+                            >
+                              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span>{item.trim()}</span>
+                            </li>
+                          ))}
                       </ul>
                     </div>
 
@@ -438,12 +465,17 @@ const SimulationDetail = () => {
                         What you'll do
                       </h4>
                       <ul className="space-y-3">
-                        {currentTask.what_youll_do?.split(',').map((item, index) => (
-                          <li key={index} className="text-gray-700 flex items-start gap-3">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span>{item.trim()}</span>
-                          </li>
-                        ))}
+                        {currentTask.what_youll_do
+                          ?.split(",")
+                          .map((item, index) => (
+                            <li
+                              key={index}
+                              className="text-gray-700 flex items-start gap-3"
+                            >
+                              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span>{item.trim()}</span>
+                            </li>
+                          ))}
                       </ul>
                     </div>
                   </div>
@@ -476,16 +508,17 @@ const SimulationDetail = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1 min-w-[25rem]">
             <div className="sticky top-32 space-y-6">
-            
               {/* Skills You'll Practice Block */}
               <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8 space-y-4">
                 <div className="p-0">
-                  <h3 className="text-xl font-semibold leading-none tracking-tight">Skills You'll Practice</h3>
+                  <h3 className="text-xl font-semibold leading-none tracking-tight">
+                    Skills You'll Practice
+                  </h3>
                 </div>
                 <div className="p-0">
                   <div className="flex flex-wrap gap-4">
-                    {(simulation.skills || '')
-                      .split(',')
+                    {(simulation.skills || "")
+                      .split(",")
                       .map((skill, index) => (
                         <div
                           key={index}
@@ -505,15 +538,16 @@ const SimulationDetail = () => {
                     <Award className="h-7 w-7 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {hasStarted ? 'Complete Your Certificate' : 'Earn a Certificate'}
+                    {hasStarted
+                      ? "Complete Your Certificate"
+                      : "Earn a Certificate"}
                   </h3>
                   <p className="text-base text-gray-600 mb-6 leading-relaxed">
-                    {hasStarted 
+                    {hasStarted
                       ? `You're making progress! Complete the remaining tasks to earn your certificate.`
-                      : 'Complete all tasks to earn your certificate and showcase your skills to potential employers.'
-                    }
+                      : "Complete all tasks to earn your certificate and showcase your skills to potential employers."}
                   </p>
-                  <button 
+                  <button
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-blue-300 bg-transparent text-blue-700 hover:bg-blue-100 w-full h-11 px-5 py-2.5"
                     onClick={handleStartProgram}
                     disabled={isLoading}
@@ -522,7 +556,6 @@ const SimulationDetail = () => {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -532,8 +565,6 @@ const SimulationDetail = () => {
 };
 
 export default SimulationDetail;
-
-
 
 // ---old code works ---
 // import React, { useState, useEffect } from 'react';
@@ -757,7 +788,6 @@ export default SimulationDetail;
 //                 })}
 //               </div>
 
-
 //               {/* Task Detail */}
 //               {currentTask && (
 //                 <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8">
@@ -838,7 +868,7 @@ export default SimulationDetail;
 //           {/* Sidebar */}
 //           <div className="lg:col-span-1 min-w-[25rem]">
 //             <div className="sticky top-32 space-y-6">
-            
+
 //               {/* Skills You'll Practice Block */}
 //               <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8 space-y-4">
 //                 <div className="p-0">
@@ -870,7 +900,7 @@ export default SimulationDetail;
 //                   <p className="text-base text-gray-600 mb-6 leading-relaxed">
 //                     Complete all tasks to earn your certificate and showcase your skills to potential employers.
 //                   </p>
-//                   <button 
+//                   <button
 //                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-blue-300 bg-transparent text-blue-700 hover:bg-blue-100 w-full h-11 px-5 py-2.5"
 //                     onClick={handleStartProgram}
 //                   >
@@ -881,7 +911,6 @@ export default SimulationDetail;
 
 //             </div>
 //           </div>
-
 
 //         </div>
 //       </div>

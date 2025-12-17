@@ -10,7 +10,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                   INTERNSHIP MODULE ARCHITECTURE                 │
+│                   INTERNSHIP MODULE ARCHITECTURE                │
 └─────────────────────────────────────────────────────────────────┘
 
 Two User Types:
@@ -30,7 +30,7 @@ Two User Types:
    └─ Can: View feedback from admin
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                        DATA FLOW                                 │
+│                        DATA FLOW                                │
 └─────────────────────────────────────────────────────────────────┘
 
 ADMIN CREATES SIMULATION:
