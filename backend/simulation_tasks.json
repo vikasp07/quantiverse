@@ -1,0 +1,248 @@
+[
+  {
+    "simulation_id": "45510087-5e12-4077-8dd3-2f9723cd9355",
+    "simulation_name": "Frontend",
+    "tasks": [
+      {
+        "task_id": "frontend_01",
+        "title": "UI Component Development",
+        "order": 1,
+        "description": "Create reusable UI components"
+      },
+      {
+        "task_id": "frontend_02",
+        "title": "State Management Setup",
+        "order": 2,
+        "description": "Implement state management with Redux"
+      },
+      {
+        "task_id": "frontend_03",
+        "title": "API Integration",
+        "order": 3,
+        "description": "Connect frontend with backend APIs"
+      },
+      {
+        "task_id": "frontend_04",
+        "title": "Responsive Design",
+        "order": 4,
+        "description": "Make application mobile responsive"
+      }
+    ]
+  },
+  {
+    "simulation_id": "86527188-ce9c-4d71-a7a7-77cdda29bddf",
+    "simulation_name": "Backend Engineering Virtual Internship",
+    "tasks": [
+      {
+        "task_id": "backend_01",
+        "title": "Database Schema Design",
+        "order": 1,
+        "description": "Design database schema for the application"
+      },
+      {
+        "task_id": "backend_02",
+        "title": "API Endpoint Development",
+        "order": 2,
+        "description": "Create RESTful API endpoints"
+      },
+      {
+        "task_id": "backend_03",
+        "title": "Authentication Implementation",
+        "order": 3,
+        "description": "Implement user authentication and authorization"
+      }
+    ]
+  },
+  {
+    "simulation_id": "40f7dabf-9a18-44aa-a4b1-94e15d964536",
+    "simulation_name": "E-Commerce Platform Development",
+    "tasks": [
+      {
+        "task_id": "ecommerce_01",
+        "title": "Product Catalog Setup",
+        "order": 1,
+        "description": "Create product database and catalog"
+      },
+      {
+        "task_id": "ecommerce_02",
+        "title": "Shopping Cart Implementation",
+        "order": 2,
+        "description": "Build shopping cart functionality"
+      },
+      {
+        "task_id": "ecommerce_03",
+        "title": "Payment Integration",
+        "order": 3,
+        "description": "Integrate payment gateway"
+      },
+      {
+        "task_id": "ecommerce_04",
+        "title": "Order Management System",
+        "order": 4,
+        "description": "Create order tracking and management"
+      },
+      {
+        "task_id": "ecommerce_05",
+        "title": "Admin Dashboard",
+        "order": 5,
+        "description": "Build admin panel for inventory management"
+      }
+    ]
+  },
+  {
+    "simulation_id": "02150bd1-2d0b-4036-ac33-a22c22675850",
+    "simulation_name": "Backend",
+    "tasks": [
+      {
+        "task_id": "backend_mini_01",
+        "title": "Server Setup",
+        "order": 1,
+        "description": "Set up backend server infrastructure"
+      },
+      {
+        "task_id": "backend_mini_02",
+        "title": "Database Configuration",
+        "order": 2,
+        "description": "Configure database connections"
+      }
+    ]
+  },
+  {
+    "simulation_id": "eef0412d-7852-45f2-96fb-e4a68e2c3d02",
+    "simulation_name": "Mobile Social Media App Development",
+    "tasks": [
+      {
+        "task_id": "mobile_01",
+        "title": "App UI Design",
+        "order": 1,
+        "description": "Design mobile app user interface"
+      },
+      {
+        "task_id": "mobile_02",
+        "title": "User Authentication",
+        "order": 2,
+        "description": "Implement user login and registration"
+      },
+      {
+        "task_id": "mobile_03",
+        "title": "Feed Implementation",
+        "order": 3,
+        "description": "Create social media feed"
+      },
+      {
+        "task_id": "mobile_04",
+        "title": "Real-time Messaging",
+        "order": 4,
+        "description": "Add messaging functionality"
+      }
+    ]
+  },
+  {
+    "simulation_id": "a3a6625e-cfca-4d6c-8d7c-ac6dae38f124",
+    "simulation_name": "Trial",
+    "tasks": [
+      {
+        "task_id": "trial_01",
+        "title": "Werwe",
+        "order": 1,
+        "description": "Complete trial task"
+      }
+    ]
+  },
+  {
+    "simulation_id": "6daf31a1-1163-4a1a-a5aa-42b9d8c41358",
+    "simulation_name": "Awerccewr",
+    "tasks": [
+      {
+        "task_id": "awer_01",
+        "title": "Task 1",
+        "order": 1,
+        "description": "First task"
+      },
+      {
+        "task_id": "awer_02",
+        "title": "Task 2",
+        "order": 2,
+        "description": "Second task"
+      }
+    ]
+  },
+  {
+    "simulation_id": "4770e0b9-4785-4079-b0b5-1b2130fcfef2",
+    "simulation_name": "Dfs Vdf",
+    "tasks": [
+      {
+        "task_id": "dfs_01",
+        "title": "Initial Setup",
+        "order": 1,
+        "description": "Set up project"
+      }
+    ]
+  },
+  {
+    "simulation_id": "dfccce66-277c-4c9c-bd55-839d63b0bb64",
+    "simulation_name": "Qwqwe",
+    "tasks": [
+      {
+        "task_id": "qwqwe_01",
+        "title": "Phase 1",
+        "order": 1,
+        "description": "First phase"
+      },
+      {
+        "task_id": "qwqwe_02",
+        "title": "Phase 2",
+        "order": 2,
+        "description": "Second phase"
+      },
+      {
+        "task_id": "qwqwe_03",
+        "title": "Phase 3",
+        "order": 3,
+        "description": "Third phase"
+      }
+    ]
+  },
+  {
+    "simulation_id": "6e020b65-cbfb-46aa-82e7-669fbfd03ba7",
+    "simulation_name": "Data Analytics Dashboard Development",
+    "tasks": [
+      {
+        "task_id": "analytics_01",
+        "title": "Data Collection",
+        "order": 1,
+        "description": "Set up data collection pipeline"
+      },
+      {
+        "task_id": "analytics_02",
+        "title": "Data Processing",
+        "order": 2,
+        "description": "Process and clean data"
+      },
+      {
+        "task_id": "analytics_03",
+        "title": "Dashboard Creation",
+        "order": 3,
+        "description": "Build analytics dashboard"
+      },
+      {
+        "task_id": "analytics_04",
+        "title": "Report Generation",
+        "order": 4,
+        "description": "Generate automated reports"
+      }
+    ]
+  },
+  {
+    "simulation_id": "6505b2bd-7ce2-428b-bb09-8a33d71a6b98",
+    "simulation_name": "Hellow",
+    "tasks": [
+      {
+        "task_id": "hellow_01",
+        "title": "Start Here",
+        "order": 1,
+        "description": "Begin the simulation"
+      }
+    ]
+  }
+]

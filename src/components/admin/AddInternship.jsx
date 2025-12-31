@@ -2,7 +2,18 @@ import React, { useState } from 'react';
 import Sidebar from '../Sidebar';
 import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from "react-router-dom";
+import { Editor } from '@tinymce/tinymce-react';
 
+// TinyMCE imports for self-hosted GPL mode
+import 'tinymce/tinymce';
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/table';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/content/default/content.min.css';
 
 
 function capitalizeWords(str) {
@@ -21,6 +32,29 @@ function numberToWords(n) {
 function AddInternship() {
 
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+  // TinyMCE editor configuration for GPL self-hosted mode
+  const editorConfig = {
+    license_key: 'gpl',
+    base_url: '/tinymce',
+    height: 250,
+    menubar: false,
+    plugins: 'lists link code table',
+    toolbar: 'undo redo | bold italic underline | bullist numlist | link | code | table',
+    forced_root_block: 'p',
+    invalid_elements: 'script,style,iframe,object,embed',
+    content_style: `
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+      ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
+      ol { list-style-type: decimal; margin: 0.5em 0; padding-left: 2em; }
+      li { margin: 0.25em 0; }
+      strong { font-weight: bold; }
+      em { font-style: italic; }
+      u { text-decoration: underline; }
+    `,
+  };
+  
   const [simulation, setSimulation] = useState({
     title: '',
     description: '',
@@ -58,8 +92,23 @@ function AddInternship() {
     setSimulation((prev) => ({ ...prev, [name]: value }));
   };
 
+  const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+  };
+
+  const handleSimulationEditorChange = (name, value) => {
+    setSimulation((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleTaskChange = (index, e) => {
     const { name, value } = e.target;
+    const updated = [...tasks];
+    updated[index][name] = value;
+    setTasks(updated);
+  };
+
+  const handleTaskEditorChange = (index, name, value) => {
     const updated = [...tasks];
     updated[index][name] = value;
     setTasks(updated);
@@ -115,6 +164,29 @@ function AddInternship() {
           }
       }
 
+      // Validate rich text lengths (max 500 chars) for key description fields
+      const richFields = ['description', 'overview', 'features', 'skills'];
+      for (const field of richFields) {
+        const raw = stripHtml(simulation[field] || '');
+        if (raw.length > 500) {
+          alert(`${field.replace(/_/g, ' ')} must not exceed 500 characters.`);
+          return false;
+        }
+      }
+
+      // Tasks rich fields
+      for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        const taskRich = ['description', 'what_youll_learn', 'what_youll_do'];
+        for (const f of taskRich) {
+          const raw = stripHtml(t[f] || '');
+          if (raw.length > 500) {
+            alert(`Task ${i + 1} '${f.replace(/_/g, ' ')}' must not exceed 500 characters.`);
+            return false;
+          }
+        }
+      }
+
       return true;
     };
 
@@ -122,36 +194,33 @@ function AddInternship() {
     const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!isFormValid()) return;
+  // Prevent duplicate submissions
+  if (isSubmitting) return;
+  setIsSubmitting(true);
+
+  if (!isFormValid()) {
+    setIsSubmitting(false);
+    return;
+  }
 
   try {
+    // ===== SEND HTML DIRECTLY TO BACKEND FOR SANITIZATION & VALIDATION =====
+    // Frontend sends:
+    // - HTML from TipTap editor (not plain text)
+    // - Backend handles: sanitization, plain-text extraction, validation, storage
     const cleanedSimulation = {
       title: capitalizeWords(simulation.title),
-      description: capitalizeWords(simulation.description),
+      description: simulation.description,  // Send HTML, not plain text
       category: capitalizeWords(simulation.category),
       difficulty: simulation.difficulty,
       duration: simulation.duration,
       image: simulation.image,
-      overview: capitalizeWords(simulation.overview),
-      features: capitalizeWords(simulation.features),
-      skills: capitalizeWords(simulation.skills),
+      overview: simulation.overview,  // Send HTML, not plain text
+      features: simulation.features,  // Send HTML, not plain text
+      skills: simulation.skills,      // Send HTML, not plain text
       rating: null,
     };
 
-    // Insert simulation first
-    const { data: simData, error: simError } = await supabase
-      .from('simulations')
-      .insert([cleanedSimulation])
-      .select()
-      .single();
-
-    if (simError) {
-      console.error('❌ Simulation insert error:', simError);
-      alert('❌ Failed to insert simulation.');
-      return;
-    }
-
-    const simulation_id = simData.id;
     const formattedTasks = [];
 
     for (let idx = 0; idx < tasks.length; idx++) {
@@ -160,7 +229,7 @@ function AddInternship() {
 
       if (task.materialFile) {
         const fileExt = task.materialFile.name.split('.').pop();
-        const fileName = `task-${simulation_id}-${idx + 1}-${Date.now()}.${fileExt}`;
+        const fileName = `task-${idx + 1}-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase
           .storage
@@ -181,26 +250,53 @@ function AddInternship() {
         materialUrl = publicUrlData?.publicUrl || '';
       }
 
+      // Send HTML directly to backend, not plain text
       formattedTasks.push({
-        simulation_id,
         title: `Task ${numberToWords(idx + 1)}`,
         full_title: capitalizeWords(task.full_title),
         duration: task.duration,
         difficulty: task.difficulty,
-        description: capitalizeWords(task.description),
-        what_youll_learn: capitalizeWords(task.what_youll_learn),
-        what_youll_do: capitalizeWords(task.what_youll_do),
+        description: task.description,  // Send HTML, not plain text
+        what_youll_learn: task.what_youll_learn,  // Send HTML, not plain text
+        what_youll_do: task.what_youll_do,  // Send HTML, not plain text
         material_url: materialUrl,
       });
     }
 
-    const { error: taskError } = await supabase
-      .from('tasks')
-      .insert(formattedTasks);
+    // ===== SEND TO BACKEND ENDPOINT FOR SANITIZATION & VALIDATION =====
+    // Backend endpoint: POST /admin/internships
+    // This endpoint handles:
+    // 1. HTML sanitization (removes scripts, events, unsafe tags)
+    // 2. Plain text extraction
+    // 3. Character validation (max 500 chars on plain text)
+    // 4. Storage in Supabase (HTML in column, plain text in *_plain column)
+    // 5. DB CHECK constraints enforce final validation
+    
+    const response = await fetch('http://localhost:5000/admin/internships', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: capitalizeWords(simulation.title),
+        category: capitalizeWords(simulation.category),
+        difficulty: simulation.difficulty,
+        duration: simulation.duration,
+        image: simulation.image,
+        description: simulation.description,  // Send raw HTML from TipTap
+        overview: simulation.overview,
+        features: simulation.features,
+        skills: simulation.skills,
+        tasks: formattedTasks,
+      }),
+    });
 
-    if (taskError) {
-      console.error('❌ Task insert error:', taskError);
-      alert('⚠️ Simulation saved, but task insert failed.');
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ Backend error:', result);
+      alert(`❌ ${result.error}`);
+      setIsSubmitting(false);
       return;
     }
 
@@ -232,32 +328,20 @@ function AddInternship() {
       materialFile: null,
       material_url: '',
     }]);
-      setFileResetKey(Date.now()); 
+      setFileResetKey(Date.now());
+      setIsSubmitting(false);
+      navigate('/edit-internship');
 
 
   } catch (error) {
     console.error('❌ Unexpected error:', error);
-    alert('❌ An unexpected error occurred.');
+    const errorMsg = error.message || 'Unknown error';
+    alert(`❌ An unexpected error occurred:\n${errorMsg}`);
+    setIsSubmitting(false);
   }
 };
 const [fileResetKey, setFileResetKey] = useState(Date.now());
 
-
-    //     const handleSubmit = async (e) => {
-    // e.preventDefault();
-    
-    // if (!isFormValid()) return;
-
-
-    // try {
-    //     // Prepare simulation data
-    //     const cleanedSimulation = {
-    //     company: capitalizeWords(simulation.company),
-    //     title: capitalizeWords(simulation.title),
-    //     description: capitalizeWords(simulation.description),
-    //     category: capitalizeWords(simulation.category),
-    //     difficulty: simulation.difficulty,
-    //     duration: simulation.duration,
     //     image: simulation.image,
     //     overview: capitalizeWords(simulation.overview),
     //     about_company: capitalizeWords(simulation.about_company),
@@ -386,6 +470,47 @@ const [fileResetKey, setFileResetKey] = useState(Date.now());
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
+            </div>
+          );
+        }
+
+        // use TinyMCE editor ONLY for description and overview
+        if (key === 'description' || key === 'overview') {
+          const plain = stripHtml(value || '');
+          return (
+            <div key={key} className="md:col-span-2">
+              <label className="block text-sm font-semibold mb-2 capitalize">
+                {key.replace(/_/g, ' ')}
+              </label>
+              <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <Editor
+                  value={value}
+                  onEditorChange={(content) => handleSimulationEditorChange(key, content)}
+                  init={editorConfig}
+                />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">{plain.length} / 500 chars</div>
+              <div className="text-xs text-gray-500 mt-1">Maximum 500 characters (plain text).</div>
+            </div>
+          );
+        }
+
+        // use textarea for features and skills
+        if (key === 'features' || key === 'skills') {
+          return (
+            <div key={key} className="md:col-span-2">
+              <label className="block text-sm font-semibold mb-2 capitalize">
+                {key.replace(/_/g, ' ')}
+              </label>
+              <textarea
+                name={key}
+                value={value}
+                onChange={handleSimulationChange}
+                rows="4"
+                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                placeholder={`Enter ${key.replace(/_/g, ' ')}`}
+              />
+              <div className="text-sm text-gray-600 mt-1">{value.length} / 500 chars</div>
             </div>
           );
         }
@@ -530,37 +655,41 @@ const [fileResetKey, setFileResetKey] = useState(Date.now());
               </select>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-2">Description</label>
-              <input
-                name="description"
-                value={task.description}
-                onChange={(e) => handleTaskChange(idx, e)}
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg"
-                placeholder="Enter description"
-              />
+              <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <Editor
+                  value={task.description}
+                  onEditorChange={(content) => handleTaskEditorChange(idx, 'description', content)}
+                  init={editorConfig}
+                />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">{stripHtml(task.description || '').length} / 500 chars</div>
+              <div className="text-xs text-gray-500 mt-1">Maximum 500 characters (plain text).</div>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-2">What You'll Learn</label>
-              <input
-                name="what_youll_learn"
+              <textarea
                 value={task.what_youll_learn}
-                onChange={(e) => handleTaskChange(idx, e)}
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                onChange={(e) => handleTaskEditorChange(idx, 'what_youll_learn', e.target.value)}
+                rows="4"
+                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="Enter what you'll learn"
               />
+              <div className="text-sm text-gray-600 mt-1">{task.what_youll_learn.length} / 500 chars</div>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-2">What You'll Do</label>
-              <input
-                name="what_youll_do"
+              <textarea
                 value={task.what_youll_do}
-                onChange={(e) => handleTaskChange(idx, e)}
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                onChange={(e) => handleTaskEditorChange(idx, 'what_youll_do', e.target.value)}
+                rows="4"
+                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="Enter what you'll do"
               />
+              <div className="text-sm text-gray-600 mt-1">{task.what_youll_do.length} / 500 chars</div>
             </div>
 
 
@@ -597,9 +726,10 @@ const [fileResetKey, setFileResetKey] = useState(Date.now());
   <div className="text-center">
     <button
       type="submit"
-      className="button button-l !bg-green-500"
+      disabled={isSubmitting}
+      className={`button button-l !bg-green-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
-      Submit Simulation
+      {isSubmitting ? 'Submitting...' : 'Submit Simulation'}
     </button>
   </div>
 </form>

@@ -9,7 +9,11 @@ import {
   MessageSquare,
   Clock,
   AlertCircle,
-  Loader2
+  Loader2,
+  X,
+  ChevronRight,
+  Award,
+  BookOpen
 } from 'lucide-react';
 import Sidebar from '../Sidebar';
 import { supabase } from '../utils/supabaseClient';
@@ -20,6 +24,8 @@ function Confirmation() {
   const [comments, setComments] = useState({});
   const [signedUrls, setSignedUrls] = useState({});
   const [processingIds, setProcessingIds] = useState(new Set());
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProgressData();
@@ -35,7 +41,8 @@ function Confirmation() {
           title
         ),
         tasks (
-          title
+          title,
+          description
         )
       `)
       .eq('confirmation_status', 'pending')
@@ -71,42 +78,6 @@ function Confirmation() {
     setSignedUrls(urlMap);
   };
 
-  // const handleDecision = async (id, decision) => {
-  //   const comment = comments[id];
-
-  //   if (!comment || comment.trim() === '') {
-  //     alert('Please enter a comment.');
-  //     return;
-  //   }
-
-  //   setProcessingIds(prev => new Set(prev).add(id));
-
-  //   const { error } = await supabase
-  //     .from('user_task_progress')
-  //     .update({ confirmation_status: decision, comment })
-  //     .eq('id', id);
-
-  //   setProcessingIds(prev => {
-  //     const newSet = new Set(prev);
-  //     newSet.delete(id);
-  //     return newSet;
-  //   });
-
-  //   if (error) {
-  //     console.error('Update failed:', error);
-  //     alert('Failed to update status');
-  //   } else {
-  //     alert(`Task ${decision === 'accepted' ? 'accepted' : 'rejected'} successfully`);
-  //     setComments((prev) => {
-  //       const updated = { ...prev };
-  //       delete updated[id];
-  //       return updated;
-  //     });
-  //     fetchProgressData();
-  //   }
-  // };
-
-
 const handleDecision = async (id, decision) => {
   const comment = comments[id];
 
@@ -123,7 +94,7 @@ const handleDecision = async (id, decision) => {
   };
 
   if (decision === 'rejected') {
-    updateFields.status = 'rejected'; // mark the task as rejected
+    updateFields.status = 'rejected';
   }
 
   const { error } = await supabase
@@ -147,6 +118,8 @@ const handleDecision = async (id, decision) => {
       delete updated[id];
       return updated;
     });
+    setModalOpen(false);
+    setSelectedTask(null);
     fetchProgressData();
   }
 };
@@ -196,6 +169,11 @@ const handleDecision = async (id, decision) => {
     return acc;
   }, {});
 
+  const openTaskModal = (task) => {
+    setSelectedTask(task);
+    setModalOpen(true);
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Sidebar />
@@ -233,109 +211,67 @@ const handleDecision = async (id, decision) => {
                 <div key={`${group.user_id}-${group.simulation_id}`} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   {/* Group Header */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6 flex-wrap">
                       <div className="flex items-center gap-2">
                         <User className="h-5 w-5 text-blue-600" />
-                        <span className="font-semibold text-gray-900">User:</span>
-                        <span className="font-mono text-blue-700 bg-blue-100 px-2 py-1 rounded text-sm">
-                          {group.user_id}
+                        <span className="font-semibold text-gray-700">User:</span>
+                        <span className="font-mono text-blue-700 bg-blue-100 px-3 py-1 rounded text-sm font-medium">
+                          {group.user_id.slice(0, 8)}...
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-indigo-600" />
-                        <span className="font-semibold text-gray-900">Program:</span>
-                        <span className="text-indigo-700 font-medium">{group.simulation_name}</span>
+                        <Award className="h-5 w-5 text-indigo-600" />
+                        <span className="font-semibold text-gray-700">Program:</span>
+                        <span className="text-indigo-700 font-medium bg-indigo-50 px-3 py-1 rounded">
+                          {group.simulation_name}
+                        </span>
+                      </div>
+                      <div className="ml-auto">
+                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                          {group.tasks.length} {group.tasks.length === 1 ? 'Task' : 'Tasks'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Tasks Grid */}
+                  {/* Tasks List View */}
                   <div className="p-6">
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-3">
                       {group.tasks.map((item) => (
                         <div
                           key={item.id}
-                          className="bg-gray-50 rounded-lg border border-gray-200 p-5 hover:shadow-md transition-all duration-200"
+                          onClick={() => openTaskModal(item)}
+                          className="flex items-center justify-between p-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md group"
                         >
-                          {/* Task Header */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-1">
-                                {item.tasks?.name || `Task ${item.task_id}`}
+                          {/* Task Info */}
+                          <div className="flex-1 flex items-center gap-4">
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
+                                <BookOpen className="h-6 w-6 text-blue-600" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                                {item.tasks?.title || `Task ${item.task_id}`}
                               </h4>
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-green-600" />
-                                <span className="text-sm text-green-700 bg-green-100 px-2 py-1 rounded-full font-medium">
+                              <div className="flex items-center gap-3 mt-1 flex-wrap">
+                                <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">
+                                  <Clock className="h-3 w-3" />
                                   {item.status}
                                 </span>
                               </div>
                             </div>
                           </div>
 
-                          {/* Download Section */}
-                          <div className="mb-4">
-                            {signedUrls[item.id] ? (
-                              <button
-                                onClick={() => downloadFileFromBucket(item)}
-                                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors duration-200 text-sm font-medium w-full justify-center"
-                              >
-                                <Download className="h-4 w-4" />
-                                Download Submission
-                              </button>
-                            ) : (
-                              <div className="flex items-center gap-2 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg text-sm">
-                                <AlertCircle className="h-4 w-4" />
-                                No file uploaded
+                          {/* Action Indicator */}
+                          <div className="flex items-center gap-3 ml-4">
+                            {item.uploaded_work_url && (
+                              <div className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded">
+                                <Download className="h-3 w-3" />
+                                File
                               </div>
                             )}
-                          </div>
-
-                          {/* Comment Section */}
-                          <div className="mb-4">
-                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                              <MessageSquare className="h-4 w-4" />
-                              Review Comment
-                            </label>
-                            <textarea
-                              className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                              placeholder="Enter your review comment..."
-                              rows={3}
-                              value={comments[item.id] || ''}
-                              onChange={(e) =>
-                                setComments((prev) => ({
-                                  ...prev,
-                                  [item.id]: e.target.value
-                                }))
-                              }
-                            />
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleDecision(item.id, 'accepted')}
-                              disabled={processingIds.has(item.id)}
-                              className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-sm"
-                            >
-                              {processingIds.has(item.id) ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <CheckCircle className="h-4 w-4" />
-                              )}
-                              Accept
-                            </button>
-                            <button
-                              onClick={() => handleDecision(item.id, 'rejected')}
-                              disabled={processingIds.has(item.id)}
-                              className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-red-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-sm"
-                            >
-                              {processingIds.has(item.id) ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <XCircle className="h-4 w-4" />
-                              )}
-                              Reject
-                            </button>
+                            <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                           </div>
                         </div>
                       ))}
@@ -347,105 +283,149 @@ const handleDecision = async (id, decision) => {
           )}
         </div>
       </div>
+
+      {/* Task Details Modal */}
+      {modalOpen && selectedTask && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                  {selectedTask.tasks?.title || `Task ${selectedTask.task_id}`}
+                </h2>
+                <p className="text-sm text-gray-600">Review and approve this submission</p>
+              </div>
+              <button
+                onClick={() => {
+                  setModalOpen(false);
+                  setSelectedTask(null);
+                }}
+                className="ml-4 p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Task Description Section */}
+              {selectedTask.tasks?.description && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-200">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    Task Description
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+                    {selectedTask.tasks.description}
+                  </p>
+                </div>
+              )}
+
+              {/* User Submission Section */}
+              <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-gray-600" />
+                  User Submission
+                </h3>
+                
+                {selectedTask.uploaded_work_url ? (
+                  <div className="space-y-3">
+                    <div className="bg-white border border-gray-300 rounded-lg p-4">
+                      <p className="text-sm text-gray-600 mb-3">
+                        <strong>Uploaded File:</strong>
+                      </p>
+                      <button
+                        onClick={() => downloadFileFromBucket(selectedTask)}
+                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-colors font-medium"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download Submission
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Submitted at: {new Date(selectedTask.updated_at).toLocaleString()}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+                    <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+                    <span className="text-yellow-800">No file has been uploaded by the user</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Admin Review Section */}
+              <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-gray-600" />
+                  Admin Review & Comment
+                </h3>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Feedback
+                  </label>
+                  <textarea
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="Enter your review comment... (This will be visible to the user)"
+                    rows={4}
+                    value={comments[selectedTask.id] || ''}
+                    onChange={(e) =>
+                      setComments((prev) => ({
+                        ...prev,
+                        [selectedTask.id]: e.target.value
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => handleDecision(selectedTask.id, 'accepted')}
+                  disabled={processingIds.has(selectedTask.id)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-3 rounded-lg font-semibold transition-colors text-base"
+                >
+                  {processingIds.has(selectedTask.id) ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <CheckCircle className="h-5 w-5" />
+                  )}
+                  {processingIds.has(selectedTask.id) ? 'Processing...' : 'Accept Task'}
+                </button>
+                <button
+                  onClick={() => handleDecision(selectedTask.id, 'rejected')}
+                  disabled={processingIds.has(selectedTask.id)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-red-400 text-white px-4 py-3 rounded-lg font-semibold transition-colors text-base"
+                >
+                  {processingIds.has(selectedTask.id) ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <XCircle className="h-5 w-5" />
+                  )}
+                  {processingIds.has(selectedTask.id) ? 'Processing...' : 'Reject Task'}
+                </button>
+                <button
+                  onClick={() => {
+                    setModalOpen(false);
+                    setSelectedTask(null);
+                  }}
+                  className="px-6 py-3 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default Confirmation;
-
-
-
-
-// -------------------------------------------------------------------------------------------
-// import React, { useEffect, useState } from 'react';
-// import Sidebar from '../Sidebar';
-// import { supabase } from '../utils/supabaseClient';
-
-// function Confirmation() {
-//   const [progressData, setProgressData] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [comments, setComments] = useState({});
-//   const [signedUrls, setSignedUrls] = useState({});
-
-//   useEffect(() => {
-//     fetchProgressData();
-//   }, []);
-
-//   const fetchProgressData = async () => {
-//     setLoading(true);
-//     const { data, error } = await supabase
-//       .from('user_task_progress')
-//       .select(`
-//         *,
-//         simulations (
-//           title
-//         ),
-//         tasks (
-//           title
-//         )
-//       `)
-//       .eq('confirmation_status', 'pending')
-//       .eq('status', 'completed');
-
-//     if (error) {
-//       console.error('Error fetching user_task_progress:', error);
-//     } else {
-//       setProgressData(data);
-//       generateSignedUrls(data);
-//     }
-//     setLoading(false);
-//   };
-
-//   const generateSignedUrls = async (data) => {
-//     const urlMap = {};
-
-//     for (const item of data) {
-//       if (item.uploaded_work_url) {
-//         const path = item.uploaded_work_url.split('/submissions/')[1];
-//         if (!path) continue;
-
-//         const { data: signed, error } = await supabase.storage
-//           .from('submissions')
-//           .createSignedUrl(path, 3600); // 1 hour
-
-//         if (!error && signed?.signedUrl) {
-//           urlMap[item.id] = signed.signedUrl;
-//         }
-//       }
-//     }
-
-//     setSignedUrls(urlMap);
-//   };
-
-//   const handleDecision = async (id, decision) => {
-//     const comment = comments[id];
-
-//     if (!comment || comment.trim() === '') {
-//       alert('Please enter a comment.');
-//       return;
-//     }
-
-//     const { error } = await supabase
-//       .from('user_task_progress')
-//       .update({ confirmation_status: decision, comment })
-//       .eq('id', id);
-
-//     if (error) {
-//       console.error('Update failed:', error);
-//       alert('Failed to update status');
-//     } else {
-//       alert(`Task ${decision === 'accepted' ? 'accepted' : 'rejected'} successfully`);
-//       setComments((prev) => {
-//         const updated = { ...prev };
-//         delete updated[id];
-//         return updated;
-//       });
-//       fetchProgressData();
-//     }
-//   };
-
-//   const downloadFileFromBucket = async (item) => {
-//     if (!item.uploaded_work_url) return;
 
 //     const path = item.uploaded_work_url.split('/submissions/')[1];
 //     if (!path) {

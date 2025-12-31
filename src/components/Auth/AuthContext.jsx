@@ -8,14 +8,22 @@ export const AuthContextProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  const signUpNewUser = async (email, password, fullName, phoneNo) => {
+  const signUpNewUser = async (
+    email,
+    password,
+    firstName,
+    lastName,
+    phoneNo
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: "http://localhost:5173/home",
         data: {
-          display_name: fullName,
+          first_name: firstName,
+          last_name: lastName,
+          display_name: `${firstName} ${lastName}`,
           phone: phoneNo,
         },
       },

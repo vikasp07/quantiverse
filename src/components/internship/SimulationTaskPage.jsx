@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   fetchSimulations,
   fetchTasksForSimulation,
@@ -16,10 +17,12 @@ import {
   FileText,
   Clock,
   ArrowLeft,
+  Eye,
 } from "lucide-react";
 import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "../utils/supabaseClient";
 import WorkUpload from "./WorkUpload";
+import SubmissionPreviewModal from "./SubmissionPreviewModal";
 
 const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
   const navigate = useNavigate();
@@ -188,6 +191,9 @@ const SimulationTaskPage = () => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollmentChecked, setEnrollmentChecked] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -215,6 +221,46 @@ const SimulationTaskPage = () => {
 
     getCurrentUser();
   }, [hookUser]);
+
+  // Check enrollment status before allowing access to tasks
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (!userLoaded || !currentUser || !id) {
+        setEnrollmentChecked(true);
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/enrollment-status', {
+          params: {
+            user_id: currentUser.id,
+            internship_id: id
+          }
+        });
+
+        if (response.data && response.data.is_enrolled) {
+          setIsEnrolled(true);
+          setEnrollmentChecked(true);
+        } else {
+          setError('You must enroll in this program before accessing tasks.');
+          setIsEnrolled(false);
+          setEnrollmentChecked(true);
+          // Redirect to simulation detail page
+          setTimeout(() => {
+            navigate(`/simulation/${id}`, { replace: true });
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Error checking enrollment:', err);
+        // Allow access anyway - don't block users if backend is down
+        // but log the error for debugging
+        setIsEnrolled(true);
+        setEnrollmentChecked(true);
+      }
+    };
+
+    checkEnrollment();
+  }, [userLoaded, currentUser, id, navigate]);
 
   const loadTasksWithProgress = useCallback(
     async (simulationId) => {
@@ -447,12 +493,30 @@ const SimulationTaskPage = () => {
     );
   }
 
-  if (loading) {
+  // Check if enrollment is being verified
+  if (!enrollmentChecked || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-500">Loading simulation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not enrolled, show error message
+  if (!isEnrolled) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Access Denied
+          </h2>
+          <p className="text-gray-600 mb-6">
+            You must enroll in this program before accessing the tasks. Redirecting...
+          </p>
         </div>
       </div>
     );
@@ -546,9 +610,14 @@ const SimulationTaskPage = () => {
                   </span>
                 )}
                 {(currentTask.confirmation_status === 'rejected' || currentTask.confirmation_status === 'accepted') && currentTask.comment && (
-                  <p className="text-sm text-gray-700 mt-2 italic">
-                    Feedback: {currentTask.comment}
-                  </p>
+                  <div className="mt-3">
+                    <div className="bg-blue-50 border-l-4 border-blue-300 text-gray-900 p-3 rounded-md text-sm leading-relaxed whitespace-pre-wrap">
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-blue-700">Feedback</span>
+                      </div>
+                      <div className="mt-1 text-gray-800">{currentTask.comment}</div>
+                    </div>
+                  </div>
                 )}
 
 
@@ -580,9 +649,14 @@ const SimulationTaskPage = () => {
                 {(currentTask.confirmation_status === "rejected" ||
                   currentTask.confirmation_status === "accepted") &&
                   currentTask.comment && (
-                    <p className="text-sm text-gray-700 mt-2 italic">
-                      Feedback: {currentTask.comment}
-                    </p>
+                    <div className="mt-3">
+                      <div className="bg-blue-50 border-l-4 border-blue-300 text-gray-900 p-3 rounded-md text-sm leading-relaxed whitespace-pre-wrap">
+                        <div className="flex items-center gap-3">
+                          <span className="font-semibold text-blue-700">Feedback</span>
+                        </div>
+                        <div className="mt-1 text-gray-800">{currentTask.comment}</div>
+                      </div>
+                    </div>
                   )}
               </>
             )}
@@ -617,6 +691,36 @@ const SimulationTaskPage = () => {
           currentUser={currentUser}
         />
 
+        {/* View Previous Submission */}
+        {currentTask.status === "completed" && currentTask.uploaded_work_url && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 flex items-center gap-2 mb-2">
+                  <FileText className="w-5 h-5" />
+                  Your Submission
+                </h3>
+                <p className="text-sm text-blue-700">
+                  View and reupload your submitted work
+                </p>
+                {currentTask.confirmation_status === "rejected" && (
+                  <p className="text-sm text-red-600 font-medium mt-2">
+                    ⚠️ This submission was rejected. Please review feedback and reupload.
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setIsPreviewModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                title="View and reupload your submission"
+              >
+                <Eye className="w-5 h-5" />
+                <span>Preview & Reupload</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Navigation buttons */}
         <div className="pt-4 flex gap-3">
           {currentTask.status === "completed" ? (
@@ -641,6 +745,23 @@ const SimulationTaskPage = () => {
             )
           )}
         </div>
+
+        {/* Submission Preview Modal */}
+        {isPreviewModalOpen && (
+          <SubmissionPreviewModal
+            task={{
+              ...currentTask,
+              user_id: currentUser?.id,
+            }}
+            isOpen={isPreviewModalOpen}
+            onClose={() => setIsPreviewModalOpen(false)}
+            onReuploadSuccess={() => {
+              setIsPreviewModalOpen(false);
+              // Reload page to refresh submission data
+              window.location.reload();
+            }}
+          />
+        )}
       </main>
     </div>
   );

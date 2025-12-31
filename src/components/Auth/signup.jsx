@@ -7,7 +7,8 @@ import { supabase } from "../utils/supabaseClient.js";
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,14 +25,21 @@ const Signup = () => {
     setToast("");
 
     try {
-      const result = await signUpNewUser(email, password, fullName, phoneNo);
+      const result = await signUpNewUser(
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNo
+      );
       if (result.success && result.emailConfirmationSent) {
         setToast("Signup successful! Please check your email to confirm.");
         setTimeout(() => setToast(""), 2000); // auto hide
 
         setEmail("");
         setPassword("");
-        setFullName("");
+        setFirstName("");
+        setLastName("");
         setPhoneNo("");
       }
       // if (result.success && result.emailConfirmationSent) {
@@ -98,14 +106,24 @@ const Signup = () => {
         </p>
 
         <form onSubmit={handleSignUp}>
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Full name"
-            className="input-style"
-            required
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First name"
+              className="input-style flex-1"
+              required
+            />
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last name"
+              className="input-style flex-1"
+              required
+            />
+          </div>
           <input
             type="text"
             value={phoneNo}

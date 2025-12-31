@@ -1,15 +1,20 @@
-from flask import Flask, request, jsonify,send_file
+from flask import Flask, request, jsonify, send_file, make_response
+import uuid
 import os
 import json
+from pathlib import Path
+from datetime import datetime
 from resume_parser import extract_text_from_pdf
 from match_gemini import match_skills
 from werkzeug.utils import secure_filename 
 import secrets
 from flask_cors import CORS
-from utils import generate_latex, compile_latex_to_pdf
+from supabase import create_client
+from internship_api import internship_bp
+# Lazy import utils only when needed to avoid heavy dependencies on startup
+# from utils import generate_latex, compile_latex_to_pdf
 import io
-from flask import make_response
-from gemini_resume_builder_helper import refine_all_bullets
+# from gemini_resume_builder_helper import refine_all_bullets
 # from utils import apply_local_spellcheck  # or spellcheck_utils if placed separately
 
 
@@ -24,9 +29,41 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax'     # Avoid CSRF in most common cases
 )
 
-# CORS(app, supports_credentials=True, origins="*")
-# CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+# CORS Configuration
+CORS(app, 
+     resources={r"/*": {
+         "origins": ["http://localhost:5173"],
+         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }})
+
+# Supabase Configuration
+SUPABASE_URL = "https://eplfwexdnkcwqdcqbgqq.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9"
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+try:
+    # Create two clients:
+    # 1. Anon client for reads (respects RLS)
+    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    
+    # 2. Service role client for writes (bypasses RLS)
+    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    
+    print("✓ Supabase clients created successfully")
+except Exception as e:
+    print(f"⚠️  Supabase connection error: {str(e)}")
+    supabase = None
+    supabase_admin = None
+
+# Store both in app config for access in blueprints
+app.config['supabase'] = supabase
+app.config['supabase_admin'] = supabase_admin
+
+# Register Blueprints
+app.register_blueprint(internship_bp)
+
+
 
 
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -98,86 +135,306 @@ def compile_resume():
         print("[ERROR] Exception in /compile:", str(e))
         return {"error": str(e)}, 500
 
-# Enrollment management endpoints
-@app.route('/enrollments', methods=['GET'])
-def get_all_enrollments():
-    """Get all enrollments"""
-    try:
-        with open('enrollments.json', 'r') as f:
-            enrollments = json.load(f)
-        return jsonify(enrollments)
-    except FileNotFoundError:
-        return jsonify([])
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/enrollments/user/<user_id>', methods=['GET'])
-def get_user_enrollments(user_id):
-    """Get enrollments for a specific user"""
-    try:
-        with open('enrollments.json', 'r') as f:
-            enrollments = json.load(f)
-        user_enrollments = [e for e in enrollments if e['user_id'] == user_id]
-        return jsonify(user_enrollments)
-    except FileNotFoundError:
-        return jsonify([])
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# ==================== ENROLLMENT ENDPOINTS ====================
 
-@app.route('/enrollments/simulation/<simulation_id>', methods=['GET'])
-def get_simulation_enrollments(simulation_id):
-    """Get enrollments for a specific simulation"""
-    try:
-        with open('enrollments.json', 'r') as f:
-            enrollments = json.load(f)
-        sim_enrollments = [e for e in enrollments if e['simulation_id'] == simulation_id]
-        return jsonify(sim_enrollments)
-    except FileNotFoundError:
-        return jsonify([])
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# File-based storage for course enrollments
+ENROLLMENTS_FILE = Path('enrollments.json')
 
-@app.route('/enrollments', methods=['POST'])
-def create_enrollment():
-    """Create a new enrollment"""
+def load_enrollments():
+    """Load enrollments from JSON file"""
+    if ENROLLMENTS_FILE.exists():
+        try:
+            with open(ENROLLMENTS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_enrollments(enrollments):
+    """Save enrollments to JSON file"""
+    with open(ENROLLMENTS_FILE, 'w') as f:
+        json.dump(enrollments, f, indent=2)
+
+# Load enrollments on startup
+course_enrollments = load_enrollments()
+
+@app.route('/enroll', methods=['POST'])
+def enroll_user():
+    """Enroll a user in an internship with simulation-specific tasks"""
     try:
         data = request.json
+        print(f"[DEBUG] Enrollment request: {data}")
         
-        # Load existing enrollments
+        user_id = data.get('user_id')
+        user_name = data.get('user_name')
+        user_email = data.get('user_email')
+        internship_id = data.get('internship_id')
+        internship_name = data.get('internship_name')
+
+        # Validate required fields
+        if not all([user_id, user_email, internship_id]):
+            print("[ERROR] Missing required fields")
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Check if already enrolled
+        existing = next(
+            (e for e in course_enrollments 
+             if e['user_id'] == user_id and e['internship_id'] == str(internship_id)),
+            None
+        )
+        
+        if existing:
+            return jsonify({'message': 'Already enrolled', 'is_enrolled': True}), 200
+
+        # ✅ Load custom tasks for this internship from simulation_tasks.json
+        tasks_for_internship = []
         try:
-            with open('enrollments.json', 'r') as f:
-                enrollments = json.load(f)
-        except FileNotFoundError:
-            enrollments = []
+            sim_tasks_path = Path('simulation_tasks.json')
+            if sim_tasks_path.exists():
+                with open(sim_tasks_path, 'r') as f:
+                    all_sim_tasks = json.load(f)
+                
+                # Find tasks for this specific simulation
+                sim_task_config = next(
+                    (st for st in all_sim_tasks if st['simulation_id'] == str(internship_id)),
+                    None
+                )
+                
+                if sim_task_config:
+                    # Convert task config to enrollment task format
+                    tasks_for_internship = [
+                        {
+                            'task_id': task['task_id'],
+                            'title': task['title'],
+                            'order': task.get('order', idx + 1),
+                            'description': task.get('description', ''),
+                            'completed': False
+                        }
+                        for idx, task in enumerate(sim_task_config['tasks'])
+                    ]
+                    print(f"[DEBUG] Loaded {len(tasks_for_internship)} tasks for internship {internship_id}")
+        except Exception as e:
+            print(f"[WARNING] Failed to load custom tasks: {str(e)}")
+
+        # Create enrollment with custom tasks
+        enrollment = {
+            'user_id': user_id,
+            'user_name': user_name or user_email.split('@')[0],
+            'user_email': user_email,
+            'internship_id': str(internship_id),
+            'internship_name': internship_name,
+            'enrolled_at': datetime.now().isoformat(),
+            'tasks': tasks_for_internship if tasks_for_internship else [
+                # Fallback: if no custom tasks found
+                {
+                    'task_id': 'task_' + str(uuid.uuid4()),
+                    'title': 'Complete Internship',
+                    'order': 1,
+                    'completed': False
+                }
+            ]
+        }
+
         
-        # Add new enrollment
-        enrollments.append(data)
+        course_enrollments.append(enrollment)
+        save_enrollments(course_enrollments)
         
-        # Save back to file
-        with open('enrollments.json', 'w') as f:
-            json.dump(enrollments, f, indent=2)
-        
-        return jsonify({'message': 'Enrollment created successfully', 'enrollment': data}), 201
+        return jsonify({
+            'message': 'Enrollment successful',
+            'enrollment': enrollment
+        }), 201
+
     except Exception as e:
+        print(f"[ERROR] Enrollment failed: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/enrollment-status', methods=['GET'])
+def check_enrollment_status():
+    """Check if a user is enrolled in an internship"""
+    try:
+        user_id = request.args.get('user_id')
+        internship_id = request.args.get('internship_id')
+        
+        print(f"[DEBUG] Checking enrollment status: user_id={user_id}, internship_id={internship_id}")
+
+        if not user_id or not internship_id:
+            return jsonify({'error': 'Missing user_id or internship_id'}), 400
+
+        # Check enrollment
+        is_enrolled = any(
+            e['user_id'] == user_id and e['internship_id'] == str(internship_id)
+            for e in course_enrollments
+        )
+        
+        print(f"[DEBUG] Is enrolled: {is_enrolled}, Total enrollments: {len(course_enrollments)}")
+
+        return jsonify({'is_enrolled': is_enrolled}), 200
+
+    except Exception as e:
+        print(f"[ERROR] Status check failed: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ===== INTERNSHIP ROUTES HANDLED BY internship_bp blueprint (see internship_api.py) =====
+# The blueprint handles:
+# - POST /admin/internships - Create new simulation
+# - PUT /admin/internships/<id> - Update simulation
+
+
+@app.route('/admin/internships/<internship_id>/candidates', methods=['GET'])
+def get_internship_candidates(internship_id):
+    """Get all candidates enrolled in a specific internship with real-time progress from Supabase"""
+    try:
+        print(f"[DEBUG] Fetching candidates for internship_id: {internship_id}")
+        print(f"[DEBUG] Total enrollments in system: {len(course_enrollments)}")
+        
+        # Filter enrollments for this internship
+        candidates = [
+            e for e in course_enrollments 
+            if e['internship_id'] == str(internship_id)
+        ]
+        
+        print(f"[DEBUG] Found {len(candidates)} candidates for this internship")
+        
+        # Sort by enrollment date (latest first)
+        candidates.sort(key=lambda x: x['enrolled_at'], reverse=True)
+        
+        # Get total number of tasks for this simulation from Supabase tasks table
+        total_tasks_for_sim = 0
+        if supabase:
+            try:
+                tasks_response = supabase.table('tasks').select(
+                    'id'
+                ).eq('simulation_id', str(internship_id)).execute()
+                
+                if tasks_response.data:
+                    total_tasks_for_sim = len(tasks_response.data)
+                    print(f"[DEBUG] Found {total_tasks_for_sim} total tasks for this simulation in Supabase")
+            except Exception as e:
+                print(f"[WARNING] Failed to get total tasks count: {str(e)}")
+        
+        # Calculate progress for each candidate from Supabase
+        for e in candidates:
+            user_id = e.get('user_id')
+            tasks = e.get('tasks', [])
+            
+            # Use Supabase total tasks count if available, else use local count
+            total_tasks = total_tasks_for_sim if total_tasks_for_sim > 0 else len(tasks)
+            
+            # Try to fetch real completion status from Supabase
+            completed_tasks = 0
+            if supabase and user_id:
+                try:
+                    # Query Supabase for completed tasks by this user in this simulation
+                    response = supabase.table('user_task_progress').select(
+                        'task_id, status'
+                    ).eq('user_id', user_id).eq('simulation_id', str(internship_id)).execute()
+                    
+                    if response.data:
+                        # Count only COMPLETED tasks from Supabase
+                        completed_tasks = len([
+                            row for row in response.data 
+                            if row.get('status') == 'completed'
+                        ])
+                        
+                        print(f"[DEBUG] {e.get('user_name')}: {completed_tasks}/{total_tasks} completed (from Supabase)")
+                    else:
+                        # No data in Supabase, use local JSON status
+                        completed_tasks = len([t for t in tasks if t.get('completed') is True])
+                        print(f"[DEBUG] {e.get('user_name')}: No Supabase data, using local JSON - {completed_tasks}/{total_tasks}")
+                        
+                except Exception as supabase_error:
+                    print(f"[WARNING] Supabase query failed for user {user_id}: {str(supabase_error)}")
+                    # Fallback to local JSON
+                    completed_tasks = len([t for t in tasks if t.get('completed') is True])
+            else:
+                # Fallback to local JSON if no Supabase or user_id
+                completed_tasks = len([t for t in tasks if t.get('completed') is True])
+            
+            e['total_tasks'] = total_tasks
+            e['completed_tasks'] = completed_tasks
+            e['progress'] = 0 if total_tasks == 0 else round(
+                (completed_tasks / total_tasks) * 100
+            )
+
+        
+        # Get internship name from first enrollment or default
+        internship_name = candidates[0]['internship_name'] if candidates else 'Internship'
+         
+        
+        return jsonify({
+            'internship_id': internship_id,
+            'internship_name': internship_name,
+            'candidates': candidates,
+            'total_count': len(candidates)
+        }), 200
     
+
+    except Exception as e:
+        import traceback
+        print(f"[ERROR] Failed to fetch candidates: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/enrollments/<internship_id>/<user_id>/tasks/<task_id>', methods=['PATCH'])
+def update_task_status(internship_id, user_id, task_id):
+    try:
+        updated = False
+
+        for e in course_enrollments:
+            if (
+                e['internship_id'] == internship_id and
+                e['user_id'] == user_id
+            ):
+                for task in e.get('tasks', []):
+                    if task['task_id'] == task_id:
+                        task['completed'] = True
+                        updated = True
+
+        if updated:
+            save_enrollments()  # whatever function you already use to save JSON
+            return jsonify({'message': 'Task marked as completed'}), 200
+
+        return jsonify({'error': 'Task not found'}), 404
+
+    except Exception as ex:
+        return jsonify({'error': str(ex)}), 500
+
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Check backend health and Supabase connection"""
+    try:
+        is_supabase_ok = False
+        if supabase:
+            try:
+                # Try a simple health check
+                supabase.table('simulations').select('*').limit(1).execute()
+                is_supabase_ok = True
+            except Exception as db_err:
+                print(f"Supabase health check failed: {str(db_err)}")
+        
+        return jsonify({
+            'status': 'ok',
+            'supabase_connected': is_supabase_ok,
+            'message': 'Backend is running'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
 
 @app.route('/')
 def index():
     return '''
     <h2>Welcome to the ATS Backend</h2>
     <p>This is the backend server. Use POST /upload_resume to upload resumes.</p>
-    <h3>Available Endpoints:</h3>
-    <ul>
-        <li>POST /upload_resume - Upload and analyze resume</li>
-        <li>POST /compile - Compile resume to PDF</li>
-        <li>GET /enrollments - Get all enrollments</li>
-        <li>GET /enrollments/user/&lt;user_id&gt; - Get user enrollments</li>
-        <li>GET /enrollments/simulation/&lt;simulation_id&gt; - Get simulation enrollments</li>
-        <li>POST /enrollments - Create new enrollment</li>
-    </ul>
     '''
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5000, debug=False, use_reloader=False)

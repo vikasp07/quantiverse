@@ -1,0 +1,49 @@
+[
+  {
+    "title": "QWERQWER",
+    "category": "QWERQWR",
+    "difficulty": "Beginner",
+    "duration": "3-4 hours",
+    "image": "WERWER",
+    "rating": null,
+    "description": "<p>WECRQWERQ</p>",
+    "description_plain": "WECRQWERQ",
+    "overview": "<p>QEWRQWER</p>",
+    "overview_plain": "QEWRQWER",
+    "features": "QWERQWER",
+    "features_plain": "QWERQWER",
+    "skills": "QWERQWER",
+    "skills_plain": "QWERQWER",
+    "id": 1
+  },
+  {
+    "title": "Traial",
+    "category": "First ;",
+    "difficulty": "Beginner",
+    "duration": "3-4 hours",
+    "image": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.computerhope.com%2Fjargon%2Fi%2Fir.htm&psig=AOvVaw3nW5Lq1oa3i0eFRkc0YU3j&ust=1766853716701000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPCEzpjZ25EDFQAAAAAdAAAAABAE",
+    "rating": null,
+    "description": "<ul>\n<li>hellow this is my first internship&nbsp;</li>\n<li>oiqhweiq</li>\n<li>qoweoq</li>\n</ul>\n<p>oqweiojqwpoje,qoiwienjoqje</p>",
+    "description_plain": "hellow this is my first internship oiqhweiq qoweoq oqweiojqwpoje,qoiwienjoqje",
+    "overview": "<p>helooww is this ia ne&nbsp;</p>",
+    "overview_plain": "helooww is this ia ne",
+    "features": "qweqwe,qweqwe,qweqwe,qweqwe",
+    "features_plain": "qweqwe,qweqwe,qweqwe,qweqwe",
+    "skills": "qeqwe.,qweqe,qweqe,qweqwe,qwewqwe",
+    "skills_plain": "qeqwe.,qweqe,qweqe,qweqwe,qwewqwe",
+    "id": 2
+  },
+  {
+    "title": "Trail",
+    "category": "Aewawe",
+    "difficulty": "Advanced",
+    "duration": "1-2 weeks",
+    "image": "aeaew",
+    "rating": null,
+    "description": "<p>aoiijaoj</p>",
+    "overview": "<p>awawe</p>",
+    "features": "aweawe",
+    "skills": "aweawe",
+    "id": 3
+  }
+]

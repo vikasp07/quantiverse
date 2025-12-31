@@ -56,6 +56,8 @@ import ScanResults from "./components/ScanResults";
 import AddInternship from "./components/admin/AddInternship";
 import SimulationsManager from "./components/admin/SimulationsManager";
 import Confirmation from "./components/admin/Confirmation";
+import InternshipCandidates from "./components/internship/InternshipCandidates";
+import InternshipSubmissions from "./components/internship/InternshipSubmissions";
 import LandingPage from "./components/resume_builder/LandingPage";
 import ResumeBuilder from "./components/resume_builder/ResumeBuilder";
 import DocumentCenter from "./components/document_center/DocumentCenter";
@@ -106,6 +108,22 @@ function App() {
         element={
           <ProtectedRoute>
             <SimulationsManager />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/internship/:internshipId/candidates"
+        element={
+          <ProtectedRoute>
+            <InternshipCandidates />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/internship/:internshipId/submissions"
+        element={
+          <ProtectedRoute>
+            <InternshipSubmissions />
           </ProtectedRoute>
         }
       />
@@ -172,8 +190,6 @@ function App() {
         }
       />
 
-      
-
       <Route
         path="/simulation/:id"
         element={
@@ -215,23 +231,15 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route 
-        path="/resume"
+      <Route path="/resume" element={<ResumeBuilder />} />
+      <Route path="/land" element={<LandingPage />} />
+
+      <Route
+        path="/document-center"
         element={
-          <ResumeBuilder/>
-        }
-      />
-      <Route 
-        path="/land" 
-        element={
-          <LandingPage />
-        } 
-      />
-      
-      <Route path="/document-center" element={
-        <ProtectedRoute>
-          <DocumentCenter />
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <DocumentCenter />
+          </ProtectedRoute>
         }
       />
 

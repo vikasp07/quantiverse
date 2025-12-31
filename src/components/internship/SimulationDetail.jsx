@@ -10,6 +10,7 @@ import {
   Target,
   Star,
 } from "lucide-react";
+import axios from "axios";
 
 import {
   fetchSimulations,
@@ -32,6 +33,8 @@ const SimulationDetail = () => {
   const [userLoaded, setUserLoaded] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [nextTaskNumber, setNextTaskNumber] = useState(1);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
 
   // Get current user
   useEffect(() => {
@@ -144,9 +147,57 @@ const SimulationDetail = () => {
     loadData();
   }, [id]);
 
+  // Check enrollment status
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (currentUser && id) {
+        try {
+          const response = await axios.get('http://127.0.0.1:5000/enrollment-status', {
+            params: { user_id: currentUser.id, internship_id: id }
+          });
+          setIsEnrolled(response.data.is_enrolled || false);
+        } catch (error) {
+          console.error('Error checking enrollment:', error);
+        }
+      }
+    };
+
+    checkEnrollment();
+  }, [currentUser, id]);
+
+  const handleEnroll = async () => {
+    if (!currentUser) {
+      alert('Please sign in to enroll');
+      return;
+    }
+
+    setIsEnrolling(true);
+    try {
+      await axios.post('http://127.0.0.1:5000/enroll', {
+        user_id: currentUser.id,
+        user_name: currentUser.user_metadata?.display_name || currentUser.email,
+        user_email: currentUser.email,
+        internship_id: id,
+        internship_name: simulation.title
+      });
+      
+      setIsEnrolled(true);
+      alert('Successfully enrolled!');
+    } catch (error) {
+      console.error('Error enrolling:', error);
+      alert('Failed to enroll. Please try again.');
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
   const currentTask = tasks.find((task) => task.id === selectedTask);
 
   const handleStartProgram = () => {
+    if (!isEnrolled) {
+      alert('Please enroll in this program first before starting.');
+      return;
+    }
     setIsLoading(true);
     setTimeout(() => {
       navigate(`/internship/${id}/task/${nextTaskNumber}`);
@@ -155,9 +206,8 @@ const SimulationDetail = () => {
 
   const getButtonText = () => {
     if (isLoading) return "Loading...";
-    if (!currentUser) return "Start Free Program";
-    if (hasStarted) return "Continue Program";
-    return "Start Free Program";
+    if (hasStarted) return "Continue Simulation";
+    return "Enter Simulation";
   };
 
   const getButtonDescription = () => {
@@ -195,9 +245,7 @@ const SimulationDetail = () => {
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 {simulation.title}
               </h1>
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed max-w-3xl">
-                {simulation.description}
-              </p>
+              <div className="text-xl text-blue-100 mb-8 leading-relaxed max-w-3xl [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-blue-100 [&_strong]:text-blue-50 [&_em]:text-blue-100" dangerouslySetInnerHTML={{ __html: simulation.description }} />
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
@@ -237,13 +285,47 @@ const SimulationDetail = () => {
                     </span>
                   </div>
                 </div>
-                <button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-md shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleStartProgram}
-                  disabled={isLoading}
-                >
-                  {getButtonText()}
-                </button>
+                
+                {/* Combined Enrollment and Start Button */}
+                {!isEnrolled ? (
+                  <button
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-4 rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
+                    onClick={handleEnroll}
+                    disabled={isEnrolling}
+                  >
+                    {isEnrolling ? 'Enrolling...' : '✓ Enroll Now - It\'s Free'}
+                  </button>
+                ) : null}
+
+                {/* Enter Simulation Button - Only shown when enrolled */}
+                {isEnrolled && (
+                  <button
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
+                    onClick={handleStartProgram}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <span>🚀 {getButtonText()}</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Status Badge when enrolled */}
+                {isEnrolled && !isLoading && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <p className="text-green-800 text-sm font-medium flex items-center justify-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      You're enrolled! Ready to start?
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -285,9 +367,7 @@ const SimulationDetail = () => {
                 Why Complete This Job Simulation
               </h2>
               <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8">
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                  {simulation.overview}
-                </p>
+                <div className="text-lg text-gray-700 leading-relaxed mb-6 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: simulation.overview }} />
                 <div className="flex flex-wrap gap-3 mb-6">
                   {simulation.features?.split(",").map((feature, index) => (
                     <div
@@ -367,9 +447,7 @@ const SimulationDetail = () => {
                       {currentTask.difficulty}
                     </div>
                   </div>
-                  <p className="text-gray-700 leading-relaxed text-lg mb-6">
-                    {currentTask.description}
-                  </p>
+                  <div className="text-gray-700 leading-relaxed text-lg mb-6 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: currentTask.description }} />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* What you'll learn */}
