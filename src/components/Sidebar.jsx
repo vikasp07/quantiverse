@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Users,
   Target,
@@ -17,16 +17,18 @@ import {
   GraduationCap,
   Layers,
   LogOut,
+  ChevronRight,
+  Briefcase,
 } from "lucide-react";
 import { supabase } from "./utils/supabaseClient";
-import { useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState("User");
+  const [email, setEmail] = useState("");
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize navigation hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -37,7 +39,8 @@ const Sidebar = () => {
 
       if (userError || !user) return setRole("user");
 
-      setFullName(user.user_metadata?.display_name || "User");
+      setFullName(user.user_metadata?.display_name || user.email?.split('@')[0] || "User");
+      setEmail(user.email || "");
 
       const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
@@ -62,140 +65,129 @@ const Sidebar = () => {
     navigate("/signin");
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="w-64 h-screen bg-white border-r border-slate-200 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const userMenuItems = [
-    // {
-    //   icon: Users,
-    //   label: "Live Interview",
-    //   active: false,
-    //   path: "/live-interview",
-    // },
-    { icon: Target, label: "Mock Interview", active: true, path: "/home" },
-    {
-      icon: BookOpen,
-      label: "Preparation Hub",
-      active: false,
-      path: "/preparation-hub",
-    },
-    {
-      icon: FileText,
-      label: "Resume Builder",
-      active: false,
-      path: "/land",
-    },
-    // { icon: BookOpen, label: "Preparation Hub", route: "/preparation-hub" },
-    {
-      icon: Layers,
-      label: "Document Center",
-      active: false,
-      path: "/document-center",
-    },
-    {
-      icon: Scan,
-      label: "ATS Score Checker",
-      active: false,
-      path: "/ats-checker",
-    },
+    { icon: Target, label: "Mock Interview", path: "/home" },
+    { icon: BookOpen, label: "Preparation Hub", path: "/preparation-hub" },
+    { icon: Briefcase, label: "Internships", path: "/internship" },
+    { icon: FileText, label: "Resume Builder", path: "/land" },
+    { icon: Layers, label: "Document Center", path: "/document-center" },
+    { icon: Scan, label: "ATS Scanner", path: "/ats-checker" },
   ];
 
   const adminMenuItems = [
-    {
-      icon: PlusCircle,
-      label: "Add Question Bank",
-      active: true,
-      path: "/admin",
-    },
-    {
-      icon: Check,
-      label: "Task Confirmation",
-      active: false,
-      path: "/confirmation",
-    },
-    {
-      icon: GraduationCap,
-      label: "Add Internship",
-      active: false,
-      path: "/edit-internship",
-    },
-  ];
-  const tools = [
-    { icon: Cpu, label: "AI Material Generator", active: false },
-    { icon: Zap, label: "Auto Apply", badge: "Beta", active: false },
+    { icon: PlusCircle, label: "Question Bank", path: "/admin" },
+    { icon: Check, label: "Task Confirmation", path: "/confirmation" },
+    { icon: GraduationCap, label: "Manage Internships", path: "/edit-internship" },
   ];
 
   const menuItems = role === "admin" ? adminMenuItems : userMenuItems;
 
   return (
-    <div className="w-64 h-screen bg-white shadow-md fixed left-0 top-0 z-10 flex flex-col justify-between">
-      {/* Top Section */}
-      <div>
-        {/* Logo */}
-        <div className="p-6 border-b border-blue-200">
-          <div className="flex items-center space-x-2">
-            <div className="bg-blue-600 text-white px-2 py-1 rounded text-sm font-bold">
-              Final Round
-            </div>
-            <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-medium">
-              AI
+    <aside className="w-64 h-screen bg-white border-r border-slate-200 flex flex-col">
+      {/* Logo */}
+      <div className="h-16 flex items-center px-5 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">Q</span>
+          </div>
+          <div>
+            <span className="font-semibold text-slate-900">Quantiverse</span>
+            <span className="ml-1.5 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-medium rounded">
+              {role === "admin" ? "ADMIN" : "AI"}
             </span>
           </div>
         </div>
+      </div>
 
-        {/* Menu */}
-        {/* <div className="p-4"> */}
-        <div className="p-4 overflow-y-auto max-h-[calc(100vh-280px)]">
-          <h3 className="text-sm font-medium text-blue-800 mb-3">
-            {role === "admin" ? "Admin Panel" : "Interview"}
-          </h3>
-
-          <nav className="space-y-1">
-            {menuItems.map((item, index) => (
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3">
+        <div className="mb-2 px-3">
+          <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+            {role === "admin" ? "Administration" : "Main Menu"}
+          </span>
+        </div>
+        
+        <div className="space-y-1">
+          {menuItems.map((item, index) => {
+            const isActive = location.pathname === item.path || 
+              (item.path !== "/home" && location.pathname.startsWith(item.path));
+            
+            return (
               <button
                 key={index}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                  location.pathname === item.path
-                    ? "bg-blue-200 text-blue-900 font-semibold"
-                    : "hover:bg-blue-100 hover:text-blue-900 text-gray-700"
-                }`}
                 onClick={() => navigate(item.path)}
+                className={`
+                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                  transition-all duration-150 group
+                  ${isActive 
+                    ? "bg-indigo-50 text-indigo-700" 
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }
+                `}
               >
-                <item.icon className="w-5 h-5" />
-                <span className="text-sm">{item.label}</span>
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600"}`} />
+                <span className="flex-1 text-left">{item.label}</span>
+                {isActive && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                )}
               </button>
-            ))}
-          </nav>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Bottom Section */}
-      <div className="p-4 space-y-2">
-        <button className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors hover:bg-blue-100 hover:text-blue-900 text-gray-700">
-          <User className="w-5 h-5" />
-          <span className="text-sm">{fullName}</span>
-        </button>
+        {/* Internships Quick Link for Users */}
+        {role !== "admin" && (
+          <>
+            <div className="mt-6 mb-2 px-3">
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Quick Actions
+              </span>
+            </div>
+            <button
+              onClick={() => navigate("/progress")}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+            >
+              <BarChart3 className="w-5 h-5 text-slate-400" />
+              <span className="flex-1 text-left">My Progress</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+          </>
+        )}
+      </nav>
 
+      {/* User Section */}
+      <div className="p-3 border-t border-slate-100">
+        {/* User Info */}
+        <div className="flex items-center gap-3 px-3 py-2 mb-2">
+          <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span className="text-sm font-medium text-indigo-700">
+              {fullName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-900 truncate">{fullName}</p>
+            <p className="text-xs text-slate-500 truncate">{email}</p>
+          </div>
+        </div>
+
+        {/* Logout Button */}
         <button
-          className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-100 transition"
           onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all"
         >
           <LogOut className="w-5 h-5" />
-          <span className="text-sm">Logout</span>
-        </button>
-
-        <button className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors hover:bg-blue-100 hover:text-blue-900 text-gray-700">
-          <BarChart3 className="w-5 h-5" />
-          <span className="text-sm">Plan Usage & Other</span>
-        </button>
-
-        <button className="button button-md w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg">
-          {role === "admin" ? "Admin Plan" : "Interview Plan"}
-        </button>
-        <button className="button button-md w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg">
-          Auto Apply Plan
+          <span>Sign Out</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

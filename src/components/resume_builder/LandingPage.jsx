@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FilePlus, UploadCloud, Loader2, FileText } from "lucide-react";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 import { supabase } from "../utils/supabaseClient";
 import { UserAuth } from "../Auth/AuthContext";
 
@@ -112,9 +112,8 @@ const LandingPage = () => {
   const handleDocCenterSelect = (filename) => setSelectedDoc(filename);
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-gray-100 via-white to-gray-100">
-      <Sidebar />
-
+    <Layout>
+      <div className="min-h-full flex bg-gradient-to-br from-gray-100 via-white to-gray-100">
     
       <input
         ref={fileInputRef}
@@ -234,6 +233,7 @@ const LandingPage = () => {
         </div>
       </div>
     </div>
+  </Layout>
   );
 };
 

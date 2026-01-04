@@ -19,23 +19,18 @@
 // export default AdminDashboard;
 
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
-import AddQuestionBank from "./admin/AddQuestionBank"; // new
-// import other admin pages here as needed...
+import Layout from "./Layout";
+import AddQuestionBank from "./admin/AddQuestionBank";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("Add Question Bank");
 
   return (
-    <div className="flex min-h-screen bg-gray-800 text-white">
-      <Sidebar setActiveTab={setActiveTab} activeTab={activeTab} />
-       <div className="flex-1 ml-64 overflow-y-auto p-8">
-
+    <Layout>
+      <div className="p-6">
         {activeTab === "Add Question Bank" && <AddQuestionBank />}
-        {/* add more tab conditions here if needed */}
-        {/* {activeTab === "Add Entries" && <AddEntries />} */}
       </div>
-    </div>
+    </Layout>
   );
 };
 

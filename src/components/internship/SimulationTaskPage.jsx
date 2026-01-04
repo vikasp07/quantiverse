@@ -28,18 +28,22 @@ const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
   const navigate = useNavigate();
 
   return (
-    <aside className="w-72 min-h-screen bg-white border-r border-gray-200 p-6 shadow-md hidden md:block">
+    <aside className="w-72 min-h-screen bg-white border-r border-slate-200 p-5 hidden md:block">
       <button
         onClick={() => navigate(`/simulation/${simulationId}`)}
-        className="flex items-center gap-2 mb-6 cursor-pointer hover:bg-gray-100 p-2 rounded transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex items-center gap-2 mb-6 cursor-pointer hover:bg-slate-50 p-2.5 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
       >
-        <ArrowLeft className="text-blue-600 w-5 h-5" />
-        <span className="text-lg font-semibold text-gray-800">
+        <ArrowLeft className="text-indigo-600 w-4 h-4" />
+        <span className="text-sm font-semibold text-slate-900 truncate">
           {simulation?.title?.split(":")[0] || "Simulation"}
         </span>
       </button>
 
-      <div className="space-y-4">
+      <div className="mb-4">
+        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Tasks</span>
+      </div>
+
+      <div className="space-y-2">
         {tasks.map((task, index) => {
           const isCompleted = task.status === "completed";
           const isCurrent = index === currentTaskIndex;
@@ -52,34 +56,37 @@ const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
               onClick={() =>
                 navigate(`/internship/${simulationId}/task/${index + 1}`)
               }
-              className={`w-full text-left p-3 rounded-lg transition-all duration-150 flex items-start space-x-3 ${
+              className={`w-full text-left p-3 rounded-xl transition-all duration-150 flex items-start gap-3 ${
                 isCurrent
-                  ? "bg-blue-50 text-blue-700 border-l-4 border-blue-600 font-semibold"
+                  ? "bg-indigo-50 border border-indigo-200"
                   : isCompleted
-                  ? "bg-green-50 text-green-700 hover:bg-green-100"
-                  : "hover:bg-gray-100 text-gray-800"
+                  ? "bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
+                  : "hover:bg-slate-50 border border-transparent"
               }`}
             >
               <div
-                className={`w-6 h-6 text-sm rounded-full flex items-center justify-center border ${
+                className={`w-7 h-7 text-xs rounded-lg flex items-center justify-center font-semibold flex-shrink-0 ${
                   isCompleted
-                    ? "bg-green-600 text-white border-green-600"
+                    ? "bg-emerald-600 text-white"
                     : isCurrent || isInProgress
-                    ? "border-blue-600 text-blue-600"
-                    : "border-gray-400 text-gray-500"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-slate-100 text-slate-500"
                 }`}
               >
                 {isCompleted ? <Check size={14} /> : index + 1}
               </div>
-              <div>
-                <p className="text-sm font-medium">{task.title}</p>
-                <p className="text-xs text-gray-500">
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-medium truncate ${isCurrent ? 'text-indigo-700' : isCompleted ? 'text-emerald-700' : 'text-slate-700'}`}>
+                  {task.title}
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">
                   {task.duration} • {task.difficulty}
                 </p>
                 {isCompleted && (
-                  <p className="text-xs text-green-600 font-medium">
-                    ✓ Completed
-                  </p>
+                  <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium mt-1">
+                    <CheckCircle size={12} />
+                    Completed
+                  </span>
                 )}
               </div>
             </button>
@@ -114,38 +121,50 @@ const TaskOverview = ({ task }) => {
       : [];
 
   return (
-    <section className="grid md:grid-cols-2 gap-6">
+    <section className="grid md:grid-cols-2 gap-5">
       {/* What You'll Learn */}
-      <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+      <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-100">
+        <h3 className="text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
+          <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
+          </div>
           What You'll Learn
         </h3>
         {learnPoints.length > 0 ? (
-          <ul className="space-y-2 list-disc list-inside text-gray-700 text-sm">
+          <ul className="space-y-2 text-slate-700 text-sm">
             {learnPoints.map((point, i) => (
-              <li key={i}>{point}</li>
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 flex-shrink-0" />
+                {point}
+              </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic text-sm">
+          <p className="text-slate-500 italic text-sm">
             No learning objectives provided.
           </p>
         )}
       </div>
 
       {/* What You'll Do */}
-      <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+      <div className="bg-indigo-50 p-5 rounded-xl border border-indigo-100">
+        <h3 className="text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+            <Briefcase className="w-4 h-4 text-indigo-600" />
+          </div>
           What You'll Do
         </h3>
         {doPoints.length > 0 ? (
-          <ul className="space-y-2 list-disc list-inside text-gray-700 text-sm">
+          <ul className="space-y-2 text-slate-700 text-sm">
             {doPoints.map((point, i) => (
-              <li key={i}>{point}</li>
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-2 flex-shrink-0" />
+                {point}
+              </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic text-sm">
+          <p className="text-slate-500 italic text-sm">
             No actions defined for this task.
           </p>
         )}
@@ -156,21 +175,26 @@ const TaskOverview = ({ task }) => {
 
 const VideoMessage = ({ url }) => {
   return (
-    <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200 bg-white p-4">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold text-gray-800">Company Message</h3>
+    <div className="rounded-xl overflow-hidden border border-slate-200 bg-white">
+      <div className="px-5 py-4 border-b border-slate-100">
+        <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+          <PlayCircle className="w-5 h-5 text-indigo-600" />
+          Company Message
+        </h3>
       </div>
       {url ? (
-        <video
-          controls
-          className="w-full rounded-lg"
-          poster="/video-poster.jpg"
-        >
-          <source src={url} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <div className="p-4">
+          <video
+            controls
+            className="w-full rounded-lg"
+            poster="/video-poster.jpg"
+          >
+            <source src={url} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
       ) : (
-        <div className="text-sm text-gray-500 italic p-4 text-center">
+        <div className="text-sm text-slate-500 italic p-8 text-center">
           No video available for this task.
         </div>
       )}
@@ -475,16 +499,18 @@ const SimulationTaskPage = () => {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center max-w-md mx-auto p-6">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-7 w-7 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
             Something went wrong
           </h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-slate-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg transition-colors font-medium"
           >
             Refresh Page
           </button>
@@ -496,10 +522,10 @@ const SimulationTaskPage = () => {
   // Check if enrollment is being verified
   if (!enrollmentChecked || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading simulation...</p>
+          <div className="w-10 h-10 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500 font-medium">Loading simulation...</p>
         </div>
       </div>
     );
@@ -508,13 +534,15 @@ const SimulationTaskPage = () => {
   // If not enrolled, show error message
   if (!isEnrolled) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-7 w-7 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
             Access Denied
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-slate-600 mb-6">
             You must enroll in this program before accessing the tasks. Redirecting...
           </p>
         </div>
@@ -530,18 +558,20 @@ const SimulationTaskPage = () => {
 
   if (!simulation || !currentTask) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-7 w-7 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
             Task not found
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-slate-600 mb-6">
             The requested task could not be found.
           </p>
           <button
             onClick={() => navigate(`/internship/${id}`)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg transition-colors font-medium"
           >
             Back to Simulation
           </button>
@@ -565,7 +595,7 @@ const SimulationTaskPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-slate-50">
       <TaskStepper
         key={simulation?.id}
         tasks={tasks}
@@ -574,20 +604,32 @@ const SimulationTaskPage = () => {
         simulation={simulation}
       />
 
-      <main className="flex-1 p-6 md:p-10 space-y-10">
+      <main className="flex-1 p-6 md:p-8 space-y-6 max-w-5xl">
         {/* Error banner */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500" />
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
             <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
 
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              {currentTask.title}
-            </h1>
+        {/* Header */}
+        <header className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-flex items-center px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-md text-xs font-medium">
+                  Task {parseInt(taskId)} of {tasks.length}
+                </span>
+                {currentTask.difficulty && (
+                  <span className="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">
+                    {currentTask.difficulty}
+                  </span>
+                )}
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                {currentTask.title}
+              </h1>
             {/* {currentTask.status === 'completed' && (
               <div className="flex items-center gap-2 text-green-600 font-medium mt-1">
                 <Check size={16} />
@@ -626,21 +668,23 @@ const SimulationTaskPage = () => {
 
             {currentTask.status === "completed" && (
               <>
-                <div className="flex items-center gap-2 text-green-600 font-medium mt-1">
-                  <Check size={16} />
-                  <span className="text-sm">Task Completed</span>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                    <Check size={14} />
+                    Task Completed
+                  </span>
                   {currentTask.confirmation_status === "pending" && (
-                    <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full ml-2">
+                    <span className="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-sm font-medium">
                       Pending Review
                     </span>
                   )}
                   {currentTask.confirmation_status === "accepted" && (
-                    <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full ml-2">
+                    <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
                       Accepted
                     </span>
                   )}
                   {currentTask.confirmation_status === "rejected" && (
-                    <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded-full ml-2">
+                    <span className="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
                       Rejected
                     </span>
                   )}
@@ -649,18 +693,18 @@ const SimulationTaskPage = () => {
                 {(currentTask.confirmation_status === "rejected" ||
                   currentTask.confirmation_status === "accepted") &&
                   currentTask.comment && (
-                    <div className="mt-3">
-                      <div className="bg-blue-50 border-l-4 border-blue-300 text-gray-900 p-3 rounded-md text-sm leading-relaxed whitespace-pre-wrap">
-                        <div className="flex items-center gap-3">
-                          <span className="font-semibold text-blue-700">Feedback</span>
+                    <div className="mt-4">
+                      <div className="bg-indigo-50 border-l-4 border-indigo-400 text-slate-900 p-4 rounded-r-lg text-sm leading-relaxed">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-indigo-700">Feedback</span>
                         </div>
-                        <div className="mt-1 text-gray-800">{currentTask.comment}</div>
+                        <div className="text-slate-700">{currentTask.comment}</div>
                       </div>
                     </div>
                   )}
               </>
             )}
-          </div>
+            </div>
 
           {currentTask.material_url && (
             <button
@@ -672,11 +716,13 @@ const SimulationTaskPage = () => {
                 link.click();
                 document.body.removeChild(link);
               }}
-              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all self-start md:self-auto"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-all self-start"
             >
-              📦 Download Task Materials
+              <FileText className="w-4 h-4" />
+              Download Materials
             </button>
           )}
+          </div>
         </header>
 
         <TaskOverview task={currentTask} />
@@ -693,41 +739,41 @@ const SimulationTaskPage = () => {
 
         {/* View Previous Submission */}
         {currentTask.status === "completed" && currentTask.uploaded_work_url && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <div className="flex items-center justify-between">
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 flex items-center gap-2 mb-2">
+                <h3 className="text-base font-semibold text-indigo-900 flex items-center gap-2 mb-1">
                   <FileText className="w-5 h-5" />
                   Your Submission
                 </h3>
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-indigo-700">
                   View and reupload your submitted work
                 </p>
                 {currentTask.confirmation_status === "rejected" && (
-                  <p className="text-sm text-red-600 font-medium mt-2">
-                    ⚠️ This submission was rejected. Please review feedback and reupload.
+                  <p className="text-sm text-red-600 font-medium mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    Submission rejected. Please review feedback and reupload.
                   </p>
                 )}
               </div>
               <button
                 onClick={() => setIsPreviewModalOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-                title="View and reupload your submission"
+                className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors text-sm"
               >
-                <Eye className="w-5 h-5" />
-                <span>Preview & Reupload</span>
+                <Eye className="w-4 h-4" />
+                Preview & Reupload
               </button>
             </div>
           </div>
         )}
 
         {/* Navigation buttons */}
-        <div className="pt-4 flex gap-3">
+        <div className="pt-2 flex gap-3">
           {currentTask.status === "completed" ? (
             <button
               onClick={handleProceedToNext}
               disabled={isCompleting}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg shadow transition-all font-semibold text-sm bg-green-600 hover:bg-green-700 text-white"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg shadow-sm transition-all font-semibold text-sm bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               <Check size={18} />
               {isLastTask
@@ -738,7 +784,7 @@ const SimulationTaskPage = () => {
             nextTask && (
               <button
                 onClick={handleSkipToNext}
-                className="inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium px-4 py-3 rounded-lg transition-all"
+                className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-5 py-3 rounded-lg transition-all"
               >
                 Skip to Next
               </button>

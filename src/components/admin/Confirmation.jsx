@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { 
   Download, 
@@ -15,7 +14,7 @@ import {
   Award,
   BookOpen
 } from 'lucide-react';
-import Sidebar from '../Sidebar';
+import Layout from '../Layout';
 import { supabase } from '../utils/supabaseClient';
 
 function Confirmation() {
@@ -175,9 +174,8 @@ const handleDecision = async (id, decision) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Sidebar />
-      <div className="flex-1 ml-64 p-8">
+    <Layout>
+      <div className="p-8 bg-gradient-to-br from-slate-50 to-blue-50 min-h-full">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -421,7 +419,7 @@ const handleDecision = async (id, decision) => {
           </div>
         </div>
       )}
-    </div>
+    </Layout>
   );
 }
 
