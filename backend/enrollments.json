@@ -298,7 +298,10 @@
         "description": "Generate automated reports",
         "completed": false
       }
-    ]
+    ],
+    "total_tasks": 4,
+    "completed_tasks": 1,
+    "progress": 25
   },
   {
     "user_id": "d4f54d49-7ba2-4aa1-8dbf-4eada49c146a",
@@ -628,6 +631,71 @@
         "title": "Report Generation",
         "order": 4,
         "description": "Generate automated reports",
+        "completed": false
+      }
+    ],
+    "total_tasks": 4,
+    "completed_tasks": 2,
+    "progress": 50
+  },
+  {
+    "user_id": "b4c54906-4caf-4c44-bfd7-b5693c7eb247",
+    "user_name": "vikas",
+    "user_email": "vksmp07@gmail.com",
+    "internship_id": "6e020b65-cbfb-46aa-82e7-669fbfd03ba7",
+    "internship_name": "Data Analytics Dashboard Development",
+    "enrolled_at": "2025-12-31T15:00:57.087610",
+    "tasks": [
+      {
+        "task_id": "analytics_01",
+        "title": "Data Collection",
+        "order": 1,
+        "description": "Set up data collection pipeline",
+        "completed": false
+      },
+      {
+        "task_id": "analytics_02",
+        "title": "Data Processing",
+        "order": 2,
+        "description": "Process and clean data",
+        "completed": false
+      },
+      {
+        "task_id": "analytics_03",
+        "title": "Dashboard Creation",
+        "order": 3,
+        "description": "Build analytics dashboard",
+        "completed": false
+      },
+      {
+        "task_id": "analytics_04",
+        "title": "Report Generation",
+        "order": 4,
+        "description": "Generate automated reports",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "user_id": "b4c54906-4caf-4c44-bfd7-b5693c7eb247",
+    "user_name": "vikas",
+    "user_email": "vksmp07@gmail.com",
+    "internship_id": "02150bd1-2d0b-4036-ac33-a22c22675850",
+    "internship_name": "Backend",
+    "enrolled_at": "2025-12-31T15:19:41.299810",
+    "tasks": [
+      {
+        "task_id": "backend_mini_01",
+        "title": "Server Setup",
+        "order": 1,
+        "description": "Set up backend server infrastructure",
+        "completed": false
+      },
+      {
+        "task_id": "backend_mini_02",
+        "title": "Database Configuration",
+        "order": 2,
+        "description": "Configure database connections",
         "completed": false
       }
     ]

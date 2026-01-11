@@ -13,7 +13,7 @@ import {
   Download,
   Filter,
 } from "lucide-react";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 import { supabase } from "../utils/supabaseClient";
 
 const InternshipSubmissions = () => {
@@ -176,22 +176,20 @@ const InternshipSubmissions = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 ml-64 p-8 flex items-center justify-center">
+      <Layout>
+        <div className="p-8 flex items-center justify-center min-h-full">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading submissions...</p>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 ml-64 p-8">
+    <Layout>
+      <div className="p-8">
         {/* Header */}
         <div className="mb-6">
           <button
@@ -447,7 +445,7 @@ const InternshipSubmissions = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
   
 };

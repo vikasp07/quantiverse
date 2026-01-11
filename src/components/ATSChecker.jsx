@@ -7,7 +7,7 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
-import Sidebar from "./Sidebar";
+import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./utils/supabaseClient.js";
 import { UserAuth } from "./Auth/AuthContext";
@@ -288,26 +288,25 @@ const ATSScanner = () => {
     ) : null;
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+    <Layout>
       {DocumentCenterPopover()}
-      <div className="flex-1 ml-64 overflow-y-auto bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="min-h-full bg-gradient-to-br from-slate-50 via-white to-indigo-50">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center p-3 bg-indigo-600 rounded-xl mb-4">
               <Scan className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-slate-900 mb-3">
               ATS Resume Scanner
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Upload your resume and job description to get comprehensive ATS
               compatibility analysis and optimization suggestions.
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <FileUploadArea
                   title="Upload Resume"
@@ -413,7 +412,7 @@ const ATSScanner = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FileText, Download, Eye, Trash2, Upload } from "lucide-react";
 import { supabase } from "../utils/supabaseClient";
 import { UserAuth } from "../Auth/AuthContext";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 
 const DocumentCenter = () => {
   const { session } = UserAuth();
@@ -223,13 +223,9 @@ const handleDelete = async (resumeId) => {
 
 
 return (
-  <div className="flex h-screen overflow-hidden bg-white">
-    <Sidebar />
-
-    {/* Main Content */}
-      <div className="flex-1 ml-64 overflow-y-auto p-8">
-    {/* <div className="flex flex-1 justify-center items-start py-12 px-4 overflow-y-auto"> */}
-      <div className="w-full max-w-5xl">
+  <Layout>
+    <div className="p-8">
+      <div className="w-full max-w-5xl mx-auto">
 
         {/* Notification Bar */}
         {message && (
@@ -328,7 +324,7 @@ return (
         </div>
       </div>
     </div>
-  </div>
+  </Layout>
 );
 
 };

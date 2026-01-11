@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 import { supabase } from "../utils/supabaseClient";
 import { Editor } from "@tinymce/tinymce-react";
 import CategoryAutocomplete from "../CategoryAutocomplete";
 
 // TinyMCE imports for self-hosted GPL mode
-import 'tinymce/tinymce';
-import 'tinymce/icons/default';
-import 'tinymce/themes/silver';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/table';
-import 'tinymce/skins/ui/oxide/skin.min.css';
-import 'tinymce/skins/content/default/content.min.css';
+import "tinymce/tinymce";
+import "tinymce/icons/default";
+import "tinymce/themes/silver";
+import "tinymce/plugins/lists";
+import "tinymce/plugins/link";
+import "tinymce/plugins/code";
+import "tinymce/plugins/table";
+import "tinymce/skins/ui/oxide/skin.min.css";
+import "tinymce/skins/content/default/content.min.css";
 
 function numberToWords(n) {
   const words = [
@@ -344,9 +344,8 @@ function SimulationsManager() {
   // PAGE
   if (view === "grid") {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 ml-64 p-8">
+      <Layout>
+        <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
@@ -464,7 +463,12 @@ function SimulationsManager() {
                         </div>
                       </div>
 
-                      <div className="text-gray-600 text-sm mb-4 line-clamp-2 [&_ul]:list-disc [&_ul]:ml-4 [&_ol]:list-decimal [&_ol]:ml-4 [&_li]:text-gray-600 [&_strong]:text-gray-800" dangerouslySetInnerHTML={{ __html: simulation.description || simulation.overview }} />
+                      <div
+                        className="text-gray-600 text-sm mb-4 line-clamp-2 [&_ul]:list-disc [&_ul]:ml-4 [&_ol]:list-decimal [&_ol]:ml-4 [&_li]:text-gray-600 [&_strong]:text-gray-800"
+                        dangerouslySetInnerHTML={{
+                          __html: simulation.description || simulation.overview,
+                        }}
+                      />
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-4">
@@ -502,16 +506,15 @@ function SimulationsManager() {
             )}
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   // INSIDE THE CARD
   if (view === "details" && selectedSimulation) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 ml-64 overflow-y-auto">
+      <Layout>
+        <div className="overflow-y-auto">
           <div className="max-w-4xl mx-auto p-8">
             {/* Header */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -668,8 +671,8 @@ function SimulationsManager() {
                       handleInputChange("description", content)
                     }
                     init={{
-                      license_key: 'gpl',
-                      base_url: '/tinymce',
+                      license_key: "gpl",
+                      base_url: "/tinymce",
                       height: 250,
                       menubar: false,
                       plugins: 'lists link table',
@@ -719,7 +722,12 @@ function SimulationsManager() {
                     }}
                   />
                 ) : (
-                  <div className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: selectedSimulation.description }} />
+                  <div
+                    className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: selectedSimulation.description,
+                    }}
+                  />
                 )}
               </div>
 
@@ -735,8 +743,8 @@ function SimulationsManager() {
                       handleInputChange("overview", content)
                     }
                     init={{
-                      license_key: 'gpl',
-                      base_url: '/tinymce',
+                      license_key: "gpl",
+                      base_url: "/tinymce",
                       height: 250,
                       menubar: false,
                       plugins: 'lists link table',
@@ -786,7 +794,12 @@ function SimulationsManager() {
                     }}
                   />
                 ) : (
-                  <div className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: selectedSimulation.overview }} />
+                  <div
+                    className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: selectedSimulation.overview,
+                    }}
+                  />
                 )}
               </div>
 
@@ -1032,7 +1045,7 @@ function SimulationsManager() {
             </div>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 
 const ResumeForm = () => {
   const [resumeType, setResumeType] = useState(null);
@@ -169,55 +169,56 @@ const ResumeForm = () => {
   // SHOW RESUME TYPE POPUP FIRST
   if (showPopup) {
     return (
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_#a1c4fd_0%,_#ffffff_100%)] bg-opacity-90 flex items-center justify-center z-50">
-        <Sidebar />
-        <div className="bg-white p-10 rounded-2xl shadow-2xl text-center space-y-6 border border-blue-300 w-[95%] sm:w-[550px] md:w-[600px] animate-scaleIn">
-          <h2 className="text-3xl font-bold text-blue-700">
-            Choose Resume Type
-          </h2>
-          <p className="text-gray-700 text-base leading-relaxed">
-            Do you want to generate a <strong>one-page</strong> or{" "}
-            <strong>two-page</strong> resume?
-          </p>
-          <div className="flex justify-center gap-6 flex-wrap mt-4">
-            <button
-              onClick={() => {
-                setResumeType("one");
-                setShowPopup(false);
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow hover:shadow-md"
-            >
-              One Page
-            </button>
-            <button
-              onClick={() => {
-                setResumeType("two");
-                setShowPopup(false);
-              }}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow hover:shadow-md"
-            >
-              Two Page
-            </button>
+      <Layout>
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_#a1c4fd_0%,_#ffffff_100%)] bg-opacity-90 flex items-center justify-center z-50">
+          <div className="bg-white p-10 rounded-2xl shadow-2xl text-center space-y-6 border border-blue-300 w-[95%] sm:w-[550px] md:w-[600px] animate-scaleIn">
+            <h2 className="text-3xl font-bold text-blue-700">
+              Choose Resume Type
+            </h2>
+            <p className="text-gray-700 text-base leading-relaxed">
+              Do you want to generate a <strong>one-page</strong> or{" "}
+              <strong>two-page</strong> resume?
+            </p>
+            <div className="flex justify-center gap-6 flex-wrap mt-4">
+              <button
+                onClick={() => {
+                  setResumeType("one");
+                  setShowPopup(false);
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow hover:shadow-md"
+              >
+                One Page
+              </button>
+              <button
+                onClick={() => {
+                  setResumeType("two");
+                  setShowPopup(false);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 shadow hover:shadow-md"
+              >
+                Two Page
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_center,_#a1c4fd_0%,_#ffffff_100%)] py-10 px-4">
-      <Sidebar />
-      <form
-        className="max-w-4xl mx-auto p-8 space-y-8 bg-white shadow-2xl rounded-xl"
-        onSubmit={handleSubmit}
-      >
-        <h2 className="text-2xl font-bold text-blue-600 border-b border-blue-200 pb-1">
-          Personal Info
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            className="p-3 border border-gray-300 rounded-md"
-            placeholder="Full Name"
+    <Layout>
+      <div className="min-h-screen w-full bg-[radial-gradient(circle_at_center,_#a1c4fd_0%,_#ffffff_100%)] py-10 px-4">
+        <form
+          className="max-w-4xl mx-auto p-8 space-y-8 bg-white shadow-2xl rounded-xl"
+          onSubmit={handleSubmit}
+        >
+          <h2 className="text-2xl font-bold text-blue-600 border-b border-blue-200 pb-1">
+            Personal Info
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              className="p-3 border border-gray-300 rounded-md"
+              placeholder="Full Name"
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -459,6 +460,7 @@ const ResumeForm = () => {
         </div>
       </form>
     </div>
+  </Layout>
   );
 };
 

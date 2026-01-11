@@ -61,6 +61,7 @@ import InternshipSubmissions from "./components/internship/InternshipSubmissions
 import LandingPage from "./components/resume_builder/LandingPage";
 import ResumeBuilder from "./components/resume_builder/ResumeBuilder";
 import DocumentCenter from "./components/document_center/DocumentCenter";
+import UserProfile from "./components/profile/UserProfile";
 
 function App() {
   const { session } = UserAuth();
@@ -124,6 +125,14 @@ function App() {
         element={
           <ProtectedRoute>
             <InternshipSubmissions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/user/:userId/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfile />
           </ProtectedRoute>
         }
       />

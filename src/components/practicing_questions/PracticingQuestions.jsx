@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import FilterBar from "./FilterBar";
 import QuestionCard from "./QuestionCard";
-import Sidebar from "../Sidebar";
+import Layout from "../Layout";
 
 export default function PreparationHub() {
   const [questions, setQuestions] = useState([]);
@@ -52,10 +52,8 @@ export default function PreparationHub() {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
-      <Sidebar />
-
-      <div className="flex-1 ml-64 p-6  bg-radial-blue overflow-y-auto">
+    <Layout>
+      <div className="p-6 bg-radial-blue">
         <h1 className="text-2xl font-bold mb-4">Question Bank</h1>
         <FilterBar filters={filters} setFilters={setFilters} />
         <div>
@@ -66,6 +64,6 @@ export default function PreparationHub() {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

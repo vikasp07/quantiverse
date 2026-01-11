@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { supabase } from '../utils/supabaseClient';
+import { Clock, BarChart, ArrowRight, CheckCircle, Building2 } from 'lucide-react';
 
 const SimulationCard = ({ simulation }) => {
   const { id, title, company, category, difficulty, duration, image, isNew } = simulation;
@@ -31,55 +32,100 @@ const SimulationCard = ({ simulation }) => {
     }
   };
 
-
+  const getDifficultyColor = (diff) => {
+    switch(diff?.toLowerCase()) {
+      case 'beginner': return 'text-green-600 bg-green-50';
+      case 'intermediate': return 'text-amber-600 bg-amber-50';
+      case 'advanced': return 'text-red-600 bg-red-50';
+      default: return 'text-slate-600 bg-slate-50';
+    }
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <div className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-indigo-200 transition-all duration-200">
       <Link to={`/simulation/${id}`}>
-        <div className="h-48 bg-radial-blue rounded-t-lg flex items-center justify-center">
+        <div className="relative h-40 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
           {image ? (
             <img
               src={image}
               alt={title}
-              className="w-full h-full object-cover rounded-t-lg"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="text-blue-950 text-4xl font-bold">
-              {title || '🏢'}
+            <div className="flex flex-col items-center justify-center text-white">
+              <Building2 className="w-10 h-10 mb-2 opacity-80" />
+              <span className="text-lg font-semibold">{company}</span>
             </div>
           )}
-        </div>
-      </Link>
-      <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-          </div>
-
-          <p className="text-sm text-gray-600 mb-2">{company}</p>
-
-          <div className="flex flex-wrap gap-2 text-xs text-gray-700 mb-3">
-            {category && <span className="bg-gray-100 px-2 py-1 rounded">{category}</span>}
-            {difficulty && <span className="bg-gray-100 px-2 py-1 rounded">{difficulty}</span>}
-            {duration && <span className="bg-gray-100 px-2 py-1 rounded">{duration}</span>}
-          </div>
-
-          {/* Enrollment Status Badge */}
+          
+          {/* Enrolled Badge */}
           {isEnrolled && (
-            <div className="mb-3">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                ✓ Enrolled
+            <div className="absolute top-3 right-3">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500 text-white shadow-sm">
+                <CheckCircle className="w-3 h-3" />
+                Enrolled
               </span>
             </div>
           )}
 
-          {/* View Details Button */}
-          <Link 
-            to={`/simulation/${id}`}
-            className="block w-full py-2 px-4 rounded-lg font-medium text-sm bg-blue-600 text-white hover:bg-blue-700 text-center transition-colors"
-          >
-            View Details
-          </Link>
+          {/* New Badge */}
+          {isNew && !isEnrolled && (
+            <div className="absolute top-3 right-3">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-600 text-white shadow-sm">
+                New
+              </span>
+            </div>
+          )}
         </div>
+      </Link>
+
+      <div className="p-5">
+        {/* Category Tag */}
+        {category && (
+          <span className="inline-block px-2.5 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 rounded-md mb-3">
+            {category}
+          </span>
+        )}
+
+        {/* Title */}
+        <h3 className="text-base font-semibold text-slate-900 mb-1 group-hover:text-indigo-700 transition-colors line-clamp-2">
+          {title}
+        </h3>
+
+        {/* Company */}
+        <p className="text-sm text-slate-500 mb-4">{company}</p>
+
+        {/* Meta Info */}
+        <div className="flex items-center gap-4 mb-4">
+          {difficulty && (
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(difficulty)}`}>
+              <BarChart className="w-3 h-3" />
+              {difficulty}
+            </span>
+          )}
+          {duration && (
+            <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+              <Clock className="w-3.5 h-3.5" />
+              {duration}
+            </span>
+          )}
+        </div>
+
+        {/* CTA Button */}
+        <Link 
+          to={`/simulation/${id}`}
+          className={`
+            flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all
+            ${isEnrolled 
+              ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' 
+              : 'bg-indigo-600 text-white hover:bg-indigo-700'
+            }
+          `}
+        >
+          {isEnrolled ? 'Continue Learning' : 'View Details'}
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </div>
   );
 };

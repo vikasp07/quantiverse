@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { ArrowLeft, User, Mail, Calendar } from 'lucide-react';
-import Sidebar from '../Sidebar';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ArrowLeft, User, Mail, Calendar } from "lucide-react";
+import Layout from "../Layout";
 
 const InternshipCandidates = () => {
   const { internshipId } = useParams();
@@ -10,11 +10,11 @@ const InternshipCandidates = () => {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [internshipName, setInternshipName] = useState('');
+  const [internshipName, setInternshipName] = useState("");
 
   useEffect(() => {
     fetchCandidates();
-    
+
     // Set up auto-refresh interval to poll for progress updates
     const refreshInterval = setInterval(() => {
       fetchCandidates();
@@ -26,14 +26,16 @@ const InternshipCandidates = () => {
 
   const fetchCandidates = async () => {
     setError(null);
-    
+
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/admin/internships/${internshipId}/candidates`);
+      const response = await axios.get(
+        `http://127.0.0.1:5000/admin/internships/${internshipId}/candidates`
+      );
       setCandidates(response.data.candidates || []);
-      setInternshipName(response.data.internship_name || 'Internship');
+      setInternshipName(response.data.internship_name || "Internship");
     } catch (err) {
-      console.error('Error fetching candidates:', err);
-      setError('Failed to load candidates. Please try again.');
+      console.error("Error fetching candidates:", err);
+      setError("Failed to load candidates. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -41,37 +43,35 @@ const InternshipCandidates = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 ml-64 p-8 flex items-center justify-center">
+      <Layout>
+        <div className="p-8 flex items-center justify-center min-h-full">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading candidates...</p>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 ml-64 p-8">
+    <Layout>
+      <div className="p-8">
         {/* Header */}
         <div className="mb-6">
           <button
-            onClick={() => navigate('/edit-internship')}
+            onClick={() => navigate("/edit-internship")}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -82,7 +82,8 @@ const InternshipCandidates = () => {
             Enrolled Candidates
           </h1>
           <p className="text-gray-600">
-            {internshipName} - {candidates.length} student{candidates.length !== 1 ? 's' : ''} enrolled
+            {internshipName} - {candidates.length} student
+            {candidates.length !== 1 ? "s" : ""} enrolled
           </p>
         </div>
 
@@ -108,38 +109,47 @@ const InternshipCandidates = () => {
         )}
 
         {/* Candidates Table */}
-        
+
         {!error && candidates.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Student Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Enrolled Date & Time
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Progress
-                </th>
-              </tr>
-
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Student Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Enrolled Date & Time
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Progress
+                  </th>
+                </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {candidates.map((candidate, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={index}
+                    className="hover:bg-blue-50 transition-colors cursor-pointer"
+                    onClick={() =>
+                      navigate(`/admin/user/${candidate.user_id}/profile`)
+                    }
+                    title="Click to view student profile"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                           <User className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {candidate.user_name || 'Unknown User'}
+                          <div className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                            {candidate.user_name || "Unknown User"}
+                          </div>
+                          <div className="text-xs text-blue-500">
+                            Click to view profile
                           </div>
                         </div>
                       </div>
@@ -147,7 +157,7 @@ const InternshipCandidates = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-700">
                         <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                        {candidate.user_email || 'No email'}
+                        {candidate.user_email || "No email"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -157,19 +167,20 @@ const InternshipCandidates = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="w-40">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
-                        <div
-                          className="bg-green-500 h-2 rounded-full transition-all"
-                          style={{ width: `${candidate.progress || 0}%` }}
-                        ></div>
+                      <div className="w-40">
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                          <div
+                            className="bg-green-500 h-2 rounded-full transition-all"
+                            style={{ width: `${candidate.progress || 0}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {candidate.completed_tasks || 0}/
+                          {candidate.total_tasks || 0} (
+                          {candidate.progress || 0}%)
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-600">
-                        {candidate.completed_tasks || 0}/{candidate.total_tasks || 0}
-                        {" "}({candidate.progress || 0}%)
-                      </div>
-                    </div>
-                  </td>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -177,7 +188,7 @@ const InternshipCandidates = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

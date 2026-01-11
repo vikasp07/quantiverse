@@ -92,11 +92,17 @@ try:
     # Create two clients:
     # 1. Anon client for reads (respects RLS)
     supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    print("✓ Supabase anon client created successfully")
     
-    # 2. Service role client for writes (bypasses RLS)
-    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    # 2. Service role client for writes (bypasses RLS) - only if key is available
+    if SUPABASE_SERVICE_ROLE_KEY:
+        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+        print("✓ Supabase admin client created successfully")
+    else:
+        supabase_admin = supabase  # Fallback to anon client
+        print("⚠️  No service role key found, using anon client for admin operations")
     
-    print("✓ Supabase clients created successfully")
+    print("✓ Supabase clients ready")
 except Exception as e:
     print(f"⚠️  Supabase connection error: {str(e)}")
     supabase = None
@@ -593,6 +599,139 @@ def search_categories():
     except Exception as e:
         print(f"Error in search_categories: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
+
+
+# ===== USER PROFILE API ENDPOINTS =====
+
+@app.route('/admin/user/<user_id>', methods=['GET'])
+def get_user_profile(user_id):
+    """
+    Get user profile with all their enrollments and statistics.
+    Used by admin to view student profiles from enrolled candidates list.
+    """
+    try:
+        user_data = None
+        enrollments_data = []
+        
+        # Try to get user info from enrollments first
+        try:
+            with open('enrollments.json', 'r') as f:
+                all_enrollments = json.load(f)
+        except FileNotFoundError:
+            all_enrollments = []
+        except json.JSONDecodeError:
+            all_enrollments = []
+        
+        # Find all enrollments for this user
+        for enrollment in all_enrollments:
+            if enrollment.get('user_id') == user_id:
+                # Use data directly from enrollment (already has all needed fields)
+                internship_name = enrollment.get('internship_name', 'Unknown Internship')
+                total_tasks = enrollment.get('total_tasks', 0)
+                
+                # Handle completed_tasks - could be a number or array
+                completed_tasks_data = enrollment.get('completed_tasks', 0)
+                if isinstance(completed_tasks_data, list):
+                    completed_tasks = len(completed_tasks_data)
+                else:
+                    completed_tasks = int(completed_tasks_data) if completed_tasks_data else 0
+                
+                # Use progress from enrollment or calculate it
+                progress = enrollment.get('progress', 0)
+                if total_tasks > 0 and progress == 0:
+                    progress = round((completed_tasks / total_tasks * 100))
+                
+                enrollments_data.append({
+                    'internship_id': enrollment.get('internship_id'),
+                    'internship_name': internship_name,
+                    'enrolled_at': enrollment.get('enrolled_at'),
+                    'completed_tasks': completed_tasks,
+                    'total_tasks': total_tasks,
+                    'progress': progress
+                })
+                
+                # Extract user info from first matching enrollment
+                if not user_data:
+                    user_data = {
+                        'id': user_id,
+                        'user_name': enrollment.get('user_name', 'Unknown User'),
+                        'user_email': enrollment.get('user_email', 'No email'),
+                        'email': enrollment.get('user_email', 'No email'),
+                        'display_name': enrollment.get('user_name', 'Unknown User'),
+                        'created_at': enrollment.get('enrolled_at')
+                    }
+        
+        # If no user data found, return basic info
+        if not user_data:
+            user_data = {
+                'id': user_id,
+                'user_name': 'Unknown User',
+                'user_email': 'No email available',
+                'display_name': 'Unknown User'
+            }
+        
+        return jsonify({
+            'user': user_data,
+            'enrollments': enrollments_data
+        }), 200
+        
+    except Exception as e:
+        print(f"Error in get_user_profile: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/user/<user_id>/enrollments', methods=['GET'])
+def get_user_enrollments(user_id):
+    """
+    Get all enrollments for a specific user.
+    """
+    try:
+        enrollments_data = []
+        
+        try:
+            with open('enrollments.json', 'r') as f:
+                all_enrollments = json.load(f)
+        except FileNotFoundError:
+            all_enrollments = []
+        except json.JSONDecodeError:
+            all_enrollments = []
+        
+        for enrollment in all_enrollments:
+            if enrollment.get('user_id') == user_id:
+                # Use data directly from enrollment
+                internship_name = enrollment.get('internship_name', 'Unknown Internship')
+                total_tasks = enrollment.get('total_tasks', 0)
+                
+                # Handle completed_tasks - could be a number or array
+                completed_tasks_data = enrollment.get('completed_tasks', 0)
+                if isinstance(completed_tasks_data, list):
+                    completed_tasks = len(completed_tasks_data)
+                else:
+                    completed_tasks = int(completed_tasks_data) if completed_tasks_data else 0
+                
+                # Use progress from enrollment or calculate it
+                progress = enrollment.get('progress', 0)
+                if total_tasks > 0 and progress == 0:
+                    progress = round((completed_tasks / total_tasks * 100))
+                
+                enrollments_data.append({
+                    'internship_id': enrollment.get('internship_id'),
+                    'internship_name': internship_name,
+                    'enrolled_at': enrollment.get('enrolled_at'),
+                    'completed_tasks': completed_tasks,
+                    'total_tasks': total_tasks,
+                    'progress': progress
+                })
+        
+        return jsonify({'enrollments': enrollments_data}), 200
+        
+    except Exception as e:
+        print(f"Error in get_user_enrollments: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/')
 def index():
