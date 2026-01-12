@@ -175,13 +175,13 @@ const handleDecision = async (id, decision) => {
 
   return (
     <Layout>
-      <div className="p-8 bg-gradient-to-br from-slate-50 to-blue-50 min-h-full">
+      <div className="p-8 bg-gradient-to-br from-slate-50 to-emerald-50 min-h-full">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <FileText className="h-6 w-6 text-emerald-600" />
               </div>
               <h1 className="text-3xl font-bold text-gray-900">Task Confirmation</h1>
             </div>
@@ -208,24 +208,24 @@ const handleDecision = async (id, decision) => {
               {Object.values(groupedData).map((group) => (
                 <div key={`${group.user_id}-${group.simulation_id}`} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   {/* Group Header */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center gap-6 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <User className="h-5 w-5 text-blue-600" />
+                        <User className="h-5 w-5 text-emerald-600" />
                         <span className="font-semibold text-gray-700">User:</span>
-                        <span className="font-mono text-blue-700 bg-blue-100 px-3 py-1 rounded text-sm font-medium">
+                        <span className="font-mono text-emerald-700 bg-emerald-100 px-3 py-1 rounded text-sm font-medium">
                           {group.user_id.slice(0, 8)}...
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Award className="h-5 w-5 text-indigo-600" />
+                        <Award className="h-5 w-5 text-teal-600" />
                         <span className="font-semibold text-gray-700">Program:</span>
-                        <span className="text-indigo-700 font-medium bg-indigo-50 px-3 py-1 rounded">
+                        <span className="text-teal-700 font-medium bg-teal-50 px-3 py-1 rounded">
                           {group.simulation_name}
                         </span>
                       </div>
                       <div className="ml-auto">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
                           {group.tasks.length} {group.tasks.length === 1 ? 'Task' : 'Tasks'}
                         </span>
                       </div>
@@ -239,17 +239,17 @@ const handleDecision = async (id, decision) => {
                         <div
                           key={item.id}
                           onClick={() => openTaskModal(item)}
-                          className="flex items-center justify-between p-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md group"
+                          className="flex items-center justify-between p-4 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md group"
                         >
                           {/* Task Info */}
                           <div className="flex-1 flex items-center gap-4">
                             <div className="flex-shrink-0">
-                              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
-                                <BookOpen className="h-6 w-6 text-blue-600" />
+                                <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center group-hover:from-emerald-200 group-hover:to-teal-200 transition-all">
+                                <BookOpen className="h-6 w-6 text-emerald-600" />
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                              <h4 className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors truncate">
                                 {item.tasks?.title || `Task ${item.task_id}`}
                               </h4>
                               <div className="flex items-center gap-3 mt-1 flex-wrap">
@@ -264,12 +264,12 @@ const handleDecision = async (id, decision) => {
                           {/* Action Indicator */}
                           <div className="flex items-center gap-3 ml-4">
                             {item.uploaded_work_url && (
-                              <div className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded">
+                              <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded">
                                 <Download className="h-3 w-3" />
                                 File
                               </div>
                             )}
-                            <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                            <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-emerald-600 transition-colors" />
                           </div>
                         </div>
                       ))}
@@ -287,7 +287,7 @@ const handleDecision = async (id, decision) => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="sticky top-0 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
                   {selectedTask.tasks?.title || `Task ${selectedTask.task_id}`}
@@ -309,9 +309,9 @@ const handleDecision = async (id, decision) => {
             <div className="p-6 space-y-6">
               {/* Task Description Section */}
               {selectedTask.tasks?.description && (
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-200">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg p-5 border border-emerald-200">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    <BookOpen className="h-5 w-5 text-emerald-600" />
                     Task Description
                   </h3>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
@@ -335,7 +335,7 @@ const handleDecision = async (id, decision) => {
                       </p>
                       <button
                         onClick={() => downloadFileFromBucket(selectedTask)}
-                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-colors font-medium"
+                        className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-lg transition-colors font-medium"
                       >
                         <Download className="h-4 w-4" />
                         Download Submission
@@ -365,7 +365,7 @@ const handleDecision = async (id, decision) => {
                     Your Feedback
                   </label>
                   <textarea
-                    className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                     placeholder="Enter your review comment... (This will be visible to the user)"
                     rows={4}
                     value={comments[selectedTask.id] || ''}

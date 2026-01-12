@@ -373,7 +373,10 @@
         "description": "Configure database connections",
         "completed": false
       }
-    ]
+    ],
+    "total_tasks": 1,
+    "completed_tasks": 1,
+    "progress": 100
   },
   {
     "user_id": "d4f54d49-7ba2-4aa1-8dbf-4eada49c146a",
@@ -561,7 +564,10 @@
         "description": "Configure database connections",
         "completed": false
       }
-    ]
+    ],
+    "total_tasks": 1,
+    "completed_tasks": 1,
+    "progress": 100
   },
   {
     "user_id": "43010a75-d40d-4c63-9e7c-a392b1b61d22",
@@ -696,6 +702,25 @@
         "title": "Database Configuration",
         "order": 2,
         "description": "Configure database connections",
+        "completed": false
+      }
+    ],
+    "total_tasks": 1,
+    "completed_tasks": 0,
+    "progress": 0
+  },
+  {
+    "user_id": "d4f54d49-7ba2-4aa1-8dbf-4eada49c146a",
+    "user_name": "atharva",
+    "user_email": "chawrekaratharva@gmail.com",
+    "internship_id": "9d4a6710-303b-425f-b240-9b68e365be42",
+    "internship_name": "Arahohu",
+    "enrolled_at": "2026-01-11T17:05:29.522518",
+    "tasks": [
+      {
+        "task_id": "task_7d2b45e7-3bc5-4f57-92cc-5efdb97dfe5c",
+        "title": "Complete Internship",
+        "order": 1,
         "completed": false
       }
     ]

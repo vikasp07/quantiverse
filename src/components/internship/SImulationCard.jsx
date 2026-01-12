@@ -44,7 +44,7 @@ const SimulationCard = ({ simulation }) => {
   return (
     <div className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-indigo-200 transition-all duration-200">
       <Link to={`/simulation/${id}`}>
-        <div className="relative h-40 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
+        <div className="relative h-40 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center overflow-hidden">
           {image ? (
             <img
               src={image}
@@ -71,7 +71,7 @@ const SimulationCard = ({ simulation }) => {
           {/* New Badge */}
           {isNew && !isEnrolled && (
             <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-600 text-white shadow-sm">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-600 text-white shadow-sm">
                 New
               </span>
             </div>
@@ -82,13 +82,13 @@ const SimulationCard = ({ simulation }) => {
       <div className="p-5">
         {/* Category Tag */}
         {category && (
-          <span className="inline-block px-2.5 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 rounded-md mb-3">
+          <span className="inline-block px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-md mb-3">
             {category}
           </span>
         )}
 
         {/* Title */}
-        <h3 className="text-base font-semibold text-slate-900 mb-1 group-hover:text-indigo-700 transition-colors line-clamp-2">
+        <h3 className="text-base font-semibold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors line-clamp-2">
           {title}
         </h3>
 

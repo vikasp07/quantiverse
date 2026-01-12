@@ -18,11 +18,31 @@ body {
 }
 
 /* ============================================
-   THEME VARIABLES
+   THEME VARIABLES - Dark Slate with Emerald
+   Primary: Emerald (#10b981)
+   Secondary: Dark Slate (#1e293b)
+   Accent: Teal (#14b8a6)
    ============================================ */
 @theme {
-  --btn-bg: #4f46e5;
-  --btn-bg-hover: #4338ca;
+  /* Primary Colors */
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-light: #d1fae5;
+  --color-primary-dark: #047857;
+  
+  /* Secondary Colors */
+  --color-secondary: #10b981;
+  --color-secondary-hover: #059669;
+  --color-secondary-light: #d1fae5;
+  
+  /* Accent Colors */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-light: #ede9fe;
+  
+  /* Button Defaults */
+  --btn-bg: var(--color-primary);
+  --btn-bg-hover: var(--color-primary-hover);
   --btn-text: white;
   --btn-radius: 0.5rem;
   --btn-font-weight: 500;
@@ -68,18 +88,18 @@ body {
    ============================================ */
 
 .bg-radial-blue {
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #d1fae5 50%, #f8fafc 100%);
 }
 
 .bg-gradient-subtle {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #ecfdf5 50%, #d1fae5 100%);
 }
 
 .bg-mesh {
   background-color: #f8fafc;
   background-image: 
-    radial-gradient(at 40% 20%, rgba(224, 231, 255, 0.5) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(199, 210, 254, 0.3) 0px, transparent 50%);
+    radial-gradient(at 40% 20%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 50%);
 }
 
 /* ============================================
@@ -108,8 +128,8 @@ body {
 }
 
 .card-interactive:hover {
-  border-color: #6366f1;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 /* ============================================
@@ -176,6 +196,7 @@ body {
 .form-input,
 .input-style {
   width: 100%;
+  margin-bottom: 1rem;
   padding: 0.625rem 0.875rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
@@ -188,8 +209,8 @@ body {
 .form-input:focus,
 .input-style:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .form-input::placeholder,
@@ -252,11 +273,11 @@ body {
   border-radius: 9999px;
 }
 
-.badge-primary { background-color: #e0e7ff; color: #4338ca; }
+.badge-primary { background-color: #d1fae5; color: #047857; }
 .badge-success { background-color: #d1fae5; color: #065f46; }
 .badge-warning { background-color: #fef3c7; color: #92400e; }
 .badge-danger { background-color: #fee2e2; color: #b91c1c; }
-.badge-info { background-color: #e0f2fe; color: #0369a1; }
+.badge-info { background-color: #e0f2fe; color: #075985; }
 
 /* ============================================
    ANIMATIONS

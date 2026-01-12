@@ -95,12 +95,12 @@ const Sidebar = () => {
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">Q</span>
           </div>
           <div>
             <span className="font-semibold text-slate-900">Quantiverse</span>
-            <span className="ml-1.5 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-medium rounded">
+            <span className="ml-1.5 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-medium rounded">
               {role === "admin" ? "ADMIN" : "AI"}
             </span>
           </div>
@@ -128,15 +128,15 @@ const Sidebar = () => {
                   w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                   transition-all duration-150 group
                   ${isActive 
-                    ? "bg-indigo-50 text-indigo-700" 
+                    ? "bg-blue-50 text-blue-700" 
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }
                 `}
               >
-                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600"}`} />
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-emerald-600" : "text-slate-400 group-hover:text-slate-600"}`} />
                 <span className="flex-1 text-left">{item.label}</span>
                 {isActive && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 )}
               </button>
             );
@@ -167,8 +167,8 @@ const Sidebar = () => {
       <div className="p-3 border-t border-slate-100">
         {/* User Info */}
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
-            <span className="text-sm font-medium text-indigo-700">
+          <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center">
+            <span className="text-sm font-medium text-emerald-700">
               {fullName.charAt(0).toUpperCase()}
             </span>
           </div>

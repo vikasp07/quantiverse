@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, send_file, make_response
 import uuid
 import os
 import json
+import re
+import traceback
 from pathlib import Path
 from datetime import datetime
 from resume_parser import extract_text_from_pdf
@@ -37,6 +39,52 @@ CORS(app,
          "allow_headers": ["Content-Type", "Authorization"],
          "supports_credentials": True
      }})
+
+# Security Headers Middleware
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    
+    # Content Security Policy (CSP)
+    # Restricts what resources can be loaded and from where
+    csp_policy = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "  # Allow inline scripts for TinyMCE
+        "style-src 'self' 'unsafe-inline'; "  # Allow inline styles
+        "img-src 'self' data: https:; "  # Allow images from self, data URIs, and HTTPS
+        "font-src 'self' data:; "
+        "connect-src 'self' http://localhost:5173 https://eplfwexdnkcwqdcqbgqq.supabase.co; "  # API calls
+        "frame-ancestors 'none'; "  # Prevent clickjacking
+        "base-uri 'self'; "  # Restrict base tag
+        "form-action 'self'; "  # Restrict form submissions
+    )
+    response.headers['Content-Security-Policy'] = csp_policy
+    
+    # X-Content-Type-Options
+    # Prevents MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+    # X-Frame-Options
+    # Prevents clickjacking attacks
+    response.headers['X-Frame-Options'] = 'DENY'
+    
+    # X-XSS-Protection
+    # Enables browser's XSS filter (legacy browsers)
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Strict-Transport-Security (HSTS)
+    # Forces HTTPS (uncomment for production with HTTPS)
+    # response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    # Referrer-Policy
+    # Controls how much referrer information is sent
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # Permissions-Policy
+    # Controls which browser features can be used
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+    
+    return response
 
 # Supabase Configuration
 SUPABASE_URL = "https://eplfwexdnkcwqdcqbgqq.supabase.co"
@@ -433,6 +481,124 @@ def health_check():
             'status': 'error',
             'message': str(e)
         }), 500
+
+
+# Category Management Endpoints
+CATEGORIES_FILE = 'categories.json'
+
+def load_categories():
+    """Load categories from JSON file"""
+    try:
+        if os.path.exists(CATEGORIES_FILE):
+            with open(CATEGORIES_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return []
+    except Exception as e:
+        print(f"Error loading categories: {e}")
+        return []
+
+def save_categories(categories):
+    """Save categories to JSON file"""
+    try:
+        with open(CATEGORIES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(categories, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"Error saving categories: {e}")
+        return False
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    """Get all categories"""
+    categories = load_categories()
+    return jsonify({'categories': categories}), 200
+
+@app.route('/api/categories', methods=['POST'])
+def add_category():
+    """Add a new category with validation"""
+    try:
+        data = request.get_json()
+        category = data.get('category', '').strip()
+        
+        # Validation 1: Required field
+        if not category:
+            return jsonify({'error': 'Category cannot be empty'}), 400
+        
+        # Validation 2: Minimum length
+        if len(category) < 3:
+            return jsonify({'error': 'Category must be at least 3 characters'}), 400
+        
+        # Validation 3: Maximum length
+        if len(category) > 50:
+            return jsonify({'error': 'Category must not exceed 50 characters'}), 400
+        
+        # Validation 4: Character restrictions (prevent XSS)
+        # Only allow alphanumeric, spaces, and safe special chars
+        if not re.match(r'^[a-zA-Z0-9\s\-&/().,]+$', category):
+            return jsonify({'error': 'Category contains invalid characters. Only letters, numbers, spaces, and - & / ( ) . , are allowed'}), 400
+        
+        # Validation 5: Sanitize HTML (defense in depth)
+        # Remove any HTML tags that might have slipped through
+        category = re.sub(r'<[^>]*>', '', category).strip()
+        
+        if not category:
+            return jsonify({'error': 'Category is empty after sanitization'}), 400
+        
+        # Load existing categories
+        categories = load_categories()
+        
+        # Validation 6: Check for duplicates (case-insensitive)
+        category_lower = category.lower()
+        if any(cat.lower() == category_lower for cat in categories):
+            return jsonify({'error': 'Category already exists', 'category': category}), 409
+        
+        # All validations passed - save category
+        categories.append(category)
+        if save_categories(categories):
+            return jsonify({'message': 'Category added successfully', 'category': category}), 201
+        else:
+            return jsonify({'error': 'Failed to save category'}), 500
+    
+    except Exception as e:
+        print(f"Error in add_category: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/categories/search', methods=['GET'])
+def search_categories():
+    """Search categories by prefix with validation"""
+    try:
+        query = request.args.get('q', '').strip()
+        
+        # Return empty if no query
+        if not query:
+            return jsonify({'categories': []}), 200
+        
+        # Validation 1: Maximum query length (prevent abuse)
+        if len(query) > 50:
+            return jsonify({'error': 'Search query too long'}), 400
+        
+        # Validation 2: Sanitize query (prevent injection)
+        query = re.sub(r'<[^>]*>', '', query).strip()
+        query_lower = query.lower()
+        
+        # Load categories
+        categories = load_categories()
+        
+        # Filter categories that start with the query (case-insensitive)
+        matching_categories = [
+            cat for cat in categories 
+            if cat.lower().startswith(query_lower)
+        ]
+        
+        # Limit results to prevent large responses
+        MAX_RESULTS = 20
+        matching_categories = matching_categories[:MAX_RESULTS]
+        
+        return jsonify({'categories': matching_categories}), 200
+    
+    except Exception as e:
+        print(f"Error in search_categories: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 # ===== USER PROFILE API ENDPOINTS =====

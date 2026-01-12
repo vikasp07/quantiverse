@@ -3,6 +3,7 @@ import Layout from "../Layout";
 import { supabase } from "../utils/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { Editor } from "@tinymce/tinymce-react";
+import CategoryAutocomplete from '../CategoryAutocomplete';
 
 // TinyMCE imports for self-hosted GPL mode
 import "tinymce/tinymce";
@@ -47,11 +48,58 @@ function AddInternship() {
     base_url: "/tinymce",
     height: 250,
     menubar: false,
-    plugins: "lists link code table",
-    toolbar:
-      "undo redo | bold italic underline | bullist numlist | link | code | table",
-    forced_root_block: "p",
-    invalid_elements: "script,style,iframe,object,embed",
+    plugins: 'lists link table',  // Removed 'code' plugin for security
+    toolbar: 'undo redo | bold italic underline | bullist numlist | link | table',
+    forced_root_block: 'p',
+    
+    // Security: Block dangerous elements
+    invalid_elements: 'script,style,iframe,object,embed,form,input,button',
+    
+    // Security: Block dangerous attributes
+    invalid_styles: 'position,top,left,right,bottom',
+    
+    // Security: URL validation
+    allow_script_urls: false,
+    convert_urls: false,
+    
+    // Security: Paste filtering
+    paste_as_text: false,
+    paste_block_drop: false,
+    paste_data_images: false,  // Block base64 images
+    paste_preprocess: function(plugin, args) {
+      // Strip dangerous content from pasted HTML
+      args.content = args.content
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+        .replace(/javascript:/gi, '')
+        .replace(/data:/gi, '');
+    },
+    
+    // Security: Link validation
+    link_assume_external_targets: true,
+    link_target_list: [
+      {title: 'None', value: ''},
+      {title: 'New window', value: '_blank'}
+    ],
+    
+    // Security: URL converter to block dangerous protocols
+    urlconverter_callback: function(url, node, on_save, name) {
+      if (url.startsWith('javascript:') || url.startsWith('data:') || url.startsWith('vbscript:')) {
+        return '';  // Block dangerous protocols
+      }
+      return url;
+    },
+    
+    // Security: Content filtering on load
+    setup: function(editor) {
+      editor.on('BeforeSetContent', function(e) {
+        // Additional sanitization before content is set
+        e.content = e.content
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+      });
+    },
+    
     content_style: `
       body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
       ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
@@ -495,6 +543,24 @@ function AddInternship() {
                           </option>
                         ))}
                       </select>
+                    </div>
+                  );
+                }
+
+                // Use CategoryAutocomplete for category field
+                if (key === 'category') {
+                  return (
+                    <div key={key}>
+                      <label className="block text-sm font-semibold mb-2 capitalize">
+                        Category
+                      </label>
+                      <CategoryAutocomplete
+                        name="category"
+                        value={value}
+                        onChange={handleSimulationChange}
+                        placeholder="Enter category"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
                     </div>
                   );
                 }

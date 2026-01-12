@@ -82,7 +82,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-300 via-white to-blue-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-100 via-white to-teal-50 px-4">
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         {toast && (
           <div className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in-out">
@@ -91,15 +91,15 @@ const Signup = () => {
         )}
       </div>
 
-      <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-blue-200 w-full max-w-md">
-        <h2 className="text-3xl mb-2 font-extrabold text-center text-blue-600">
+      <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-emerald-200 w-full max-w-md">
+        <h2 className="text-3xl mb-2 font-extrabold text-center text-emerald-600">
           Sign Up Today
         </h2>
         <p className="mb-6 text-sm text-center text-gray-600">
           Already have an account?{" "}
           <Link
             to="/signin"
-            className="text-blue-500 font-medium hover:underline"
+            className="text-emerald-500 font-medium hover:underline"
           >
             Sign in!
           </Link>
@@ -152,7 +152,7 @@ const Signup = () => {
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-3 right-3 text-blue-400 cursor-pointer"
+              className="absolute top-3 right-3 text-emerald-400 cursor-pointer"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
@@ -163,7 +163,7 @@ const Signup = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-all duration-300"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-lg transition-all duration-300"
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>

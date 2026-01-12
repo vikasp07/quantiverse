@@ -24,7 +24,7 @@ export const PageHeader = ({
             <React.Fragment key={index}>
               {index > 0 && <ChevronRight className="w-4 h-4" />}
               {item.href ? (
-                <a href={item.href} className="hover:text-indigo-600 transition-colors">
+                <a href={item.href} className="hover:text-emerald-600 transition-colors">
                   {item.label}
                 </a>
               ) : (
@@ -85,8 +85,8 @@ export const StatCard = ({
           )}
         </div>
         {Icon && (
-          <div className="p-3 bg-indigo-50 rounded-xl">
-            <Icon className="w-6 h-6 text-indigo-600" />
+          <div className="p-3 bg-emerald-50 rounded-xl">
+            <Icon className="w-6 h-6 text-emerald-600" />
           </div>
         )}
       </div>
@@ -150,8 +150,8 @@ export const Button = ({
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-sm',
-    secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-indigo-500',
+    primary: 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500 shadow-sm',
+    secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-emerald-500',
     ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-500',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     success: 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'

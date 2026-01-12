@@ -267,7 +267,7 @@ const Signin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-300 via-white to-blue-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-100 via-white to-teal-50 px-4">
       {/* Toast Message */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
         {toast && (
@@ -277,8 +277,8 @@ const Signin = () => {
         )}
       </div>
 
-      <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-blue-200 w-full max-w-md">
-        <h2 className="text-3xl mb-6 font-extrabold text-center text-blue-600">
+      <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-emerald-200 w-full max-w-md">
+        <h2 className="text-3xl mb-6 font-extrabold text-center text-emerald-600">
           Sign In to Continue
         </h2>
 
@@ -288,7 +288,7 @@ const Signin = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email address"
-            className="w-full mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-gray-800 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-gray-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             required
           />
 
@@ -298,19 +298,19 @@ const Signin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full mb-2 p-3 rounded-lg bg-blue-50 border border-blue-200 text-gray-800 placeholder-blue-400 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full mb-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-gray-800 placeholder-emerald-400 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-400"
               required
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-3 right-3 text-blue-400 cursor-pointer"
+              className="absolute top-3 right-3 text-emerald-400 cursor-pointer"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
 
           <p
-            className="text-sm text-right text-blue-500 hover:underline cursor-pointer mb-4"
+            className="text-sm text-right text-emerald-500 hover:underline cursor-pointer mb-4"
             onClick={handleForgotPassword}
           >
             Forgot Password?
@@ -321,7 +321,7 @@ const Signin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-all duration-300"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-lg transition-all duration-300"
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>
@@ -331,7 +331,7 @@ const Signin = () => {
           Don't have an account?{" "}
           <a
             href="/signup"
-            className="text-blue-500 font-medium hover:underline"
+            className="text-emerald-500 font-medium hover:underline"
           >
             Sign up here
           </a>

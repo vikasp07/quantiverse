@@ -40,7 +40,7 @@ const InternshipDashboard = () => {
   });
 
   const stats = [
-    { label: 'Total Simulations', value: simulations.length, icon: Briefcase, color: 'indigo' },
+    { label: 'Total Simulations', value: simulations.length, icon: Briefcase, color: 'blue' },
     { label: 'Categories', value: uniqueCategories.length - 1, icon: Filter, color: 'emerald' },
   ];
 
@@ -53,7 +53,7 @@ const InternshipDashboard = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1 max-w-2xl">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
+                  <div className="p-2 bg-emerald-100 rounded-lg">
                     <Sparkles className="w-5 h-5 text-indigo-600" />
                   </div>
                   <span className="text-sm font-medium text-indigo-600">Virtual Internships</span>
@@ -71,7 +71,7 @@ const InternshipDashboard = () => {
               {/* Progress Button */}
               <button
                 onClick={() => navigate('/progress')}
-                className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm"
+                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors shadow-sm"
               >
                 <BarChart2 className="w-4 h-4" />
                 Track Progress
@@ -82,7 +82,7 @@ const InternshipDashboard = () => {
             <div className="flex gap-6 mt-6">
               {stats.map((stat, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${stat.color === 'indigo' ? 'bg-indigo-100' : 'bg-emerald-100'}`}>
+                  <div className={`p-2 rounded-lg ${stat.color === 'cyan' ? 'bg-cyan-100' : 'bg-emerald-100'}`}>
                     <stat.icon className={`w-4 h-4 ${stat.color === 'indigo' ? 'text-indigo-600' : 'text-emerald-600'}`} />
                   </div>
                   <div>
