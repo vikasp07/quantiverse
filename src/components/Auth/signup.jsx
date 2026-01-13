@@ -14,15 +14,38 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [toast, setToast] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const { signUpNewUser } = UserAuth();
   const navigate = useNavigate();
+
+  // ✅ Email validation regex pattern
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validateEmail = (emailValue) => {
+    if (!emailValue) {
+      setEmailError('');
+      return true;
+    }
+    if (!emailRegex.test(emailValue)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setToast("");
+
+    // ✅ Validate email format before submission
+    if (!validateEmail(email)) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const result = await signUpNewUser(
@@ -132,14 +155,29 @@ const Signup = () => {
             className="input-style"
             required
           />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-            className="input-style"
-            required
-          />
+          <div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateEmail(e.target.value);
+              }}
+              onBlur={() => validateEmail(email)}
+              placeholder="Email address"
+              className={`input-style border ${
+                emailError
+                  ? 'border-red-500 focus:ring-red-400'
+                  : 'focus:ring-emerald-400'
+              }`}
+              required
+            />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <span>✗</span> {emailError}
+              </p>
+            )}
+          </div>
 
           <div className="relative">
             <input
