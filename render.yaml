@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: quantiverse-backend
+    env: python
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SUPABASE_URL
+        value: https://eplfwexdnkcwqdcqbgqq.supabase.co
+      - key: SUPABASE_KEY
+        value: sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9

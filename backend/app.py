@@ -32,13 +32,8 @@ app.config.update(
 )
 
 # CORS Configuration
-CORS(app, 
-     resources={r"/*": {
-         "origins": ["http://localhost:5173"],
-         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
-         "allow_headers": ["Content-Type", "Authorization"],
-         "supports_credentials": True
-     }})
+
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Security Headers Middleware
 @app.after_request
