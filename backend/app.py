@@ -33,7 +33,16 @@ app.config.update(
 
 # CORS Configuration
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app,
+     resources={r"/*": {
+         "origins": [
+             "http://localhost:5173",
+             "https://quantiverse-frontend-wepz.onrender.com/"
+         ],
+         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }})
 
 # Security Headers Middleware
 @app.after_request
