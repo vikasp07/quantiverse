@@ -82,8 +82,8 @@ def add_security_headers(response):
     return response
 
 # Supabase Configuration
-SUPABASE_URL = "https://eplfwexdnkcwqdcqbgqq.supabase.co"
-SUPABASE_ANON_KEY = "sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9"
+SUPABASE_URL = os.getenv("SUPABASE_URL"),
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 try:
     # Create two clients:
