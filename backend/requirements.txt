@@ -4,4 +4,4 @@ PyPDF2
 google-generativeai
 python-dotenv
 textblob
-supabase-py
+supabase==2.5.1
