@@ -116,8 +116,9 @@ const InternshipSubmissions = () => {
   };
 
   const markTaskComplete = async (taskId) => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
   await axios.patch(
-    `http://127.0.0.1:5000/enrollments/${internshipId}/${userId}/tasks/${taskId}`
+    `${API_BASE}/enrollments/${internshipId}/${userId}/tasks/${taskId}`
   );
 
   // refetch candidates or tasks

@@ -83,7 +83,7 @@ const ResumeForm = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/compile",
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/compile`,
         { ...formData, resumeType },
         { responseType: "blob" } //blob = Binary Large Object (used for files).
       );

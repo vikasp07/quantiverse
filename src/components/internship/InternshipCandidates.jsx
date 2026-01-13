@@ -28,8 +28,9 @@ const InternshipCandidates = () => {
     setError(null);
 
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(
-        `http://127.0.0.1:5000/admin/internships/${internshipId}/candidates`
+        `${API_BASE}/admin/internships/${internshipId}/candidates`
       );
       setCandidates(response.data.candidates || []);
       setInternshipName(response.data.internship_name || "Internship");

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { UserAuth } from '../Auth/AuthContext';
 
-const API_BASE = 'http://127.0.0.1:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 /**
  * Activity Tracker Component

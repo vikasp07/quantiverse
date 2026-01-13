@@ -152,7 +152,8 @@ const SimulationDetail = () => {
     const checkEnrollment = async () => {
       if (currentUser && id) {
         try {
-          const response = await axios.get('http://127.0.0.1:5000/enrollment-status', {
+          const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+          const response = await axios.get(`${API_BASE}/enrollment-status`, {
             params: { user_id: currentUser.id, internship_id: id }
           });
           setIsEnrolled(response.data.is_enrolled || false);
@@ -173,7 +174,8 @@ const SimulationDetail = () => {
 
     setIsEnrolling(true);
     try {
-      await axios.post('http://127.0.0.1:5000/enroll', {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      await axios.post(`${API_BASE}/enroll`, {
         user_id: currentUser.id,
         user_name: currentUser.user_metadata?.display_name || currentUser.email,
         user_email: currentUser.email,
