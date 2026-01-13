@@ -32,7 +32,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import "./styles.css";
-import VideoCallContent from "./components/mock/VideoCallContent";
+// import VideoCallContent from "./components/mock/VideoCallContent";
 import PracticingQuestions from "./components/practicing_questions/PracticingQuestions";
 import JobReadinessAssessment from "./components/job_readiness/JobReadinessAssessment";
 import Feedback from "./components/job_readiness/Feedback";
