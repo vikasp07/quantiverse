@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SimulationCard from './SimulationCard'; 
+import SImulationCard from './SImulationCard'; 
 import Layout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { fetchSimulations } from '../utils/simulations';
@@ -153,7 +153,7 @@ const InternshipDashboard = () => {
           ) : filteredSimulations.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSimulations.map((simulation) => (
-                <SimulationCard key={simulation.id} simulation={simulation} />
+                <SImulationCard key={simulation.id} simulation={simulation} />
               ))}
             </div>
           ) : (
