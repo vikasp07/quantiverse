@@ -5,3 +5,4 @@ google-generativeai
 python-dotenv
 textblob
 supabase==2.5.1
+gunicorn
