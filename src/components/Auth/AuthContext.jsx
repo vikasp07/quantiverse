@@ -19,7 +19,7 @@ export const AuthContextProvider = ({ children }) => {
       email,
       password,
       options: {
-        emailRedirectTo: "http://localhost:5173/home",
+        emailRedirectTo: "https://quantiverse-frontend-wepz.onrender.com/internship",
         data: {
           first_name: firstName,
           last_name: lastName,

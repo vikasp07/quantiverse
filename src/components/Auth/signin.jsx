@@ -247,24 +247,23 @@ const Signin = () => {
           const { data: roleData, error: roleError } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", user.id)
-            .single();
+            .eq("user_id", user.id);
 
           if (roleError) {
             console.warn("Role fetch warning:", roleError);
-            // ✅ Default to 'user' role if not found
-            navigate("/home");
+            // ✅ Default to 'internship' role if not found
+            navigate("/internship");
             return;
           }
 
-          if (roleData?.role === "admin") {
+          if (roleData && roleData.length > 0 && roleData[0]?.role === "admin") {
             navigate("/admin");
           } else {
-            navigate("/home");
+            navigate("/internship");
           }
         } catch (roleErr) {
           console.error("Role fetch error:", roleErr);
-          navigate("/home"); // ✅ Default fallback
+          navigate("/internship"); // ✅ Default fallback
         }
       } else {
         // ✅ Show user-friendly error messages
