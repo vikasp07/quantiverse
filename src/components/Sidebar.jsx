@@ -74,16 +74,16 @@ const Sidebar = () => {
   }
 
   const userMenuItems = [
-    { icon: Target, label: "Mock Interview", path: "/home" },
-    { icon: BookOpen, label: "Preparation Hub", path: "/preparation-hub" },
+    //{ icon: Target, label: "Mock Interview", path: "/home" },
+    //{ icon: BookOpen, label: "Preparation Hub", path: "/preparation-hub" },
     { icon: Briefcase, label: "Internships", path: "/internship" },
-    { icon: FileText, label: "Resume Builder", path: "/land" },
-    { icon: Layers, label: "Document Center", path: "/document-center" },
-    { icon: Scan, label: "ATS Scanner", path: "/ats-checker" },
+    //{ icon: FileText, label: "Resume Builder", path: "/land" },
+    //{ icon: Layers, label: "Document Center", path: "/document-center" },
+    //{ icon: Scan, label: "ATS Scanner", path: "/ats-checker" },
   ];
 
   const adminMenuItems = [
-    { icon: PlusCircle, label: "Question Bank", path: "/admin" },
+    // { icon: PlusCircle, label: "Question Bank", path: "/admin" }, // Disabled
     { icon: Check, label: "Task Confirmation", path: "/confirmation" },
     { icon: GraduationCap, label: "Manage Internships", path: "/edit-internship" },
   ];
@@ -118,7 +118,7 @@ const Sidebar = () => {
         <div className="space-y-1">
           {menuItems.map((item, index) => {
             const isActive = location.pathname === item.path || 
-              (item.path !== "/home" && location.pathname.startsWith(item.path));
+              (item.path !== "/internship" && location.pathname.startsWith(item.path));
             
             return (
               <button

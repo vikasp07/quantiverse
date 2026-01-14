@@ -20,15 +20,19 @@
 
 import React, { useState } from "react";
 import Layout from "./Layout";
-import AddQuestionBank from "./admin/AddQuestionBank";
+// import AddQuestionBank from "./admin/AddQuestionBank"; // Disabled
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("Add Question Bank");
+  const [activeTab, setActiveTab] = useState("Dashboard");
 
   return (
     <Layout>
       <div className="p-6">
-        {activeTab === "Add Question Bank" && <AddQuestionBank />}
+        {/* Question Bank Feature Disabled */}
+        {/* {activeTab === "Add Question Bank" && <AddQuestionBank />} */}
+        <div className="text-center py-12">
+          <p className="text-slate-600">Question Bank feature is currently disabled.</p>
+        </div>
       </div>
     </Layout>
   );

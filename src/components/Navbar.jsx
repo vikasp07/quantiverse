@@ -45,9 +45,8 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
   // Get page title based on current route
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === "/home") return "Mock Interview";
-    if (path === "/preparation-hub") return "Preparation Hub";
     if (path === "/internship") return "Internships";
+    if (path === "/preparation-hub") return "Preparation Hub";
     if (path === "/land") return "Resume Builder";
     if (path === "/document-center") return "Document Center";
     if (path === "/ats-checker") return "ATS Scanner";

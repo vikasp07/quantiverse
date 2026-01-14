@@ -61,7 +61,7 @@ const UserProfile = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activityData, setActivityData] = useState(null);
+  const [enrollmentActivityData, setActivityData] = useState(null);
   const [stats, setStats] = useState({
     totalEnrolled: 0,
     completed: 0,
@@ -83,8 +83,9 @@ const UserProfile = () => {
 
     try {
       // Fetch user profile directly from backend API
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(
-        `http://127.0.0.1:5000/admin/user/${userId}`
+        `${API_BASE}/admin/user/${userId}`
       );
       setUser(response.data.user);
       setEnrollments(response.data.enrollments || []);
@@ -99,8 +100,9 @@ const UserProfile = () => {
 
   const fetchActivityData = async () => {
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(
-        `http://127.0.0.1:5000/admin/user/${userId}/activity`
+        `${API_BASE}/admin/user/${userId}/activity`
       );
       setActivityData(response.data);
     } catch (err) {

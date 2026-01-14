@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
-import Feedback from "./feedback";
+import Feedback from "./Feedback";
 
 const VideoCallContent = () => {
   const [isVideoOn, setIsVideoOn] = useState(true);

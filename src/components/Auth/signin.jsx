@@ -156,8 +156,25 @@ const Signin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState("");
+  const [emailError, setEmailError] = useState("");
   const { signInUser } = UserAuth();
   const navigate = useNavigate();
+
+  // ✅ Email validation regex pattern
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validateEmail = (emailValue) => {
+    if (!emailValue) {
+      setEmailError('');
+      return true;
+    }
+    if (!emailRegex.test(emailValue)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
 
   // ✅ Forgot Password Handler
   const handleForgotPassword = async () => {
@@ -199,6 +216,12 @@ const Signin = () => {
         return;
       }
 
+      // ✅ Validate email format before submission
+      if (!validateEmail(trimmedEmail)) {
+        setLoading(false);
+        return;
+      }
+
       const result = await signInUser({
         email: trimmedEmail,
         password: trimmedPassword,
@@ -224,24 +247,23 @@ const Signin = () => {
           const { data: roleData, error: roleError } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", user.id)
-            .single();
+            .eq("user_id", user.id);
 
           if (roleError) {
             console.warn("Role fetch warning:", roleError);
-            // ✅ Default to 'user' role if not found
-            navigate("/home");
+            // ✅ Default to 'internship' role if not found
+            navigate("/internship");
             return;
           }
 
-          if (roleData?.role === "admin") {
+          if (roleData && roleData.length > 0 && roleData[0]?.role === "admin") {
             navigate("/admin");
           } else {
-            navigate("/home");
+            navigate("/internship");
           }
         } catch (roleErr) {
           console.error("Role fetch error:", roleErr);
-          navigate("/home"); // ✅ Default fallback
+          navigate("/internship"); // ✅ Default fallback
         }
       } else {
         // ✅ Show user-friendly error messages
@@ -283,14 +305,29 @@ const Signin = () => {
         </h2>
 
         <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-            className="w-full mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-gray-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            required
-          />
+          <div className="mb-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateEmail(e.target.value);
+              }}
+              onBlur={() => validateEmail(email)}
+              placeholder="Email address"
+              className={`w-full p-3 rounded-lg bg-emerald-50 border text-gray-800 placeholder-emerald-400 focus:outline-none focus:ring-2 transition-colors ${
+                emailError
+                  ? 'border-red-500 focus:ring-red-400'
+                  : 'border-emerald-200 focus:ring-emerald-400'
+              }`}
+              required
+            />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <span>✗</span> {emailError}
+              </p>
+            )}
+          </div>
 
           <div className="relative">
             <input

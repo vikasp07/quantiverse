@@ -18,7 +18,7 @@ const UploadResume = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/upload_resume",
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/upload_resume`,
         formData,
         {
           headers: {

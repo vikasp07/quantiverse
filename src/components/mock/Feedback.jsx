@@ -120,7 +120,7 @@ const Feedback = () => {
       </h2>
       <button
         className="button button-lg"
-        onClick={() => navigate('/home')}
+        onClick={() => navigate('/internship')}
       >
         Go to Dashboard
       </button>

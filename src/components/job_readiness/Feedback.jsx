@@ -16,7 +16,7 @@ const Feedback = () => {
 
       <button
         className="button button-m mb-5"
-        onClick={() => navigate("/home")}
+        onClick={() => navigate("/internship")}
       >
         Return Home
       </button>

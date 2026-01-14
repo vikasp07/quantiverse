@@ -5,7 +5,8 @@ import { supabase } from './supabaseClient';
 export async function fetchSimulations() {
   try {
     // Try backend endpoint first (has fallback to JSON)
-    const response = await fetch('http://localhost:5000/admin/internships');
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const response = await fetch(`${API_BASE}/admin/internships`);
     if (response.ok) {
       const result = await response.json();
       if (result.data) {

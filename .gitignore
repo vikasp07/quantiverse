@@ -1,7 +1,9 @@
-﻿node_modules/
+﻿git pullnode_modules/
 __pycache__/
 *.pyc
 .env
+.env.local
+backend/.env
 .venv
 venv/
 dist/
@@ -9,3 +11,4 @@ build/
 *.log
 .DS_Store
 uploads/
+node_modules

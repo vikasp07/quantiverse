@@ -32,10 +32,14 @@ app.config.update(
 )
 
 # CORS Configuration
-CORS(app, 
+
+CORS(app,
      resources={r"/*": {
-         "origins": ["http://localhost:5173"],
-         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+         "origins": [
+             "http://localhost:5173",
+             "https://quantiverse-frontend-wepz.onrender.com"
+         ],
+         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
          "allow_headers": ["Content-Type", "Authorization"],
          "supports_credentials": True
      }})
@@ -87,9 +91,12 @@ def add_security_headers(response):
     return response
 
 # Supabase Configuration
-SUPABASE_URL = "https://eplfwexdnkcwqdcqbgqq.supabase.co"
-SUPABASE_ANON_KEY = "sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+print(type(SUPABASE_URL), SUPABASE_URL)
+print(type(SUPABASE_ANON_KEY), len(SUPABASE_ANON_KEY or ""))
+
 try:
     # Create two clients:
     # 1. Anon client for reads (respects RLS)
@@ -128,66 +135,59 @@ def allowed_file(filename):
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route('/upload_resume', methods=['POST'])
-def upload_resume():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+# ==================== ATS SCANNER - DISABLED ====================
+# @app.route('/upload_resume', methods=['POST'])
+# def upload_resume():
+#     if 'file' not in request.files:
+#         return jsonify({'error': 'No file uploaded'}), 400
+#
+#     file = request.files['file']
+#     if not allowed_file(file.filename):
+#         return jsonify({'error': 'Only PDF files are allowed'}), 400
+#     job_description = request.form.get('job_description', 'Software Developer')
+#
+#     filename = secure_filename(file.filename)
+#     filepath = os.path.join(UPLOAD_FOLDER, filename)
+#     file.save(filepath)
+#
+#     resume_text = extract_text_from_pdf(filepath)
+#     if not job_description:
+#         job_description = "Looking for a frontend developer skilled in React, JavaScript, and UI/UX design."
+#     score, matched_skills = match_skills(resume_text, job_description)
+#
+#     return jsonify({
+#         'score': score,
+#         'matched_skills': matched_skills
+#     })
 
-    file = request.files['file']
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'Only PDF files are allowed'}), 400
-    job_description = request.form.get('job_description', 'Software Developer')
 
-    filename = secure_filename(file.filename)  # ✅ this sanitizes the name
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
-
-    resume_text = extract_text_from_pdf(filepath)
-    # If no job description is passed from frontend, use a default for now
-    if not job_description:
-        job_description = "Looking for a frontend developer skilled in React, JavaScript, and UI/UX design."
-    score, matched_skills = match_skills(resume_text, job_description)
-
-    return jsonify({
-        # 'resume_text': resume_text,
-        'score': score,
-        'matched_skills': matched_skills
-    })
-
-
-@app.route("/compile", methods=["POST"])
-def compile_resume():
-    try:
-        data = request.json
-
-        # ✅ Limit project and education count
-        if data.get("resumeType") == "one":
-            data['projects'] = data['projects'][:4]
-            data['education'] = data['education'][:2]
-
-        # ✅ Apply local spell check (offline, fast)
-        # data = apply_local_spellcheck(data)
-
-        data = refine_all_bullets(data)
-        
-        latex = generate_latex(data)
-
-        pdf = compile_latex_to_pdf(latex)
-        print("[DEBUG] Compiled PDF:", "Success" if pdf else "Failed")
-
-        if pdf:
-            response = make_response(pdf)
-            response.headers.set("Content-Type", "application/pdf")
-            response.headers.set("Content-Disposition", "attachment", filename="resume.pdf")
-            response.headers.set("Access-Control-Allow-Origin", "http://localhost:5173")
-            # response.headers.set("Access-Control-Allow-Headers", "Content-Type")
-            return response
-        else:
-            return {"error": "LaTeX compilation failed"}, 500
-
-    except Exception as e:
-        print("[ERROR] Exception in /compile:", str(e))
-        return {"error": str(e)}, 500
+# ==================== RESUME BUILDER - DISABLED ====================
+# @app.route("/compile", methods=["POST"])
+# def compile_resume():
+#     try:
+#         data = request.json
+#
+#         if data.get("resumeType") == "one":
+#             data['projects'] = data['projects'][:4]
+#             data['education'] = data['education'][:2]
+#
+#         data = refine_all_bullets(data)
+#         latex = generate_latex(data)
+#         pdf = compile_latex_to_pdf(latex)
+#         print("[DEBUG] Compiled PDF:", "Success" if pdf else "Failed")
+#
+#         if pdf:
+#             response = make_response(pdf)
+#             response.headers.set("Content-Type", "application/pdf")
+#             response.headers.set("Content-Disposition", "attachment", filename="resume.pdf")
+#             response.headers.set("Access-Control-Allow-Origin", "http://localhost:5173")
+#             return response
+#         else:
+#             return {"error": "LaTeX compilation failed"}, 500
+#
+#     except Exception as e:
+#         print("[ERROR] Exception in /compile:", str(e))
+#         return {"error": str(e)}, 500
 
 
 # ==================== ENROLLMENT ENDPOINTS ====================

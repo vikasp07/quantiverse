@@ -32,7 +32,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import "./styles.css";
-import VideoCallContent from "./components/mock/VideoCallContent";
+// import VideoCallContent from "./components/mock/VideoCallContent";
 import PracticingQuestions from "./components/practicing_questions/PracticingQuestions";
 import JobReadinessAssessment from "./components/job_readiness/JobReadinessAssessment";
 import Feedback from "./components/job_readiness/Feedback";
@@ -142,6 +142,7 @@ function App() {
       />
 
       {/* Protected Routes */}
+      {/* Mock Interview /home - Disabled
       <Route
         path="/home"
         element={
@@ -151,6 +152,8 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
+      {/* Mock Interview /mockInterview - Disabled
       <Route
         path="/mockInterview"
         element={
@@ -159,6 +162,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
       <Route
         path="/practicing-questions"
         element={
@@ -183,8 +187,11 @@ function App() {
           </ProtectedRoute>
         }
       />
+      {/* ATS Checker - Disabled
       <Route path="/ats-checker" element={<ATSChecker />} />
+      */}
 
+      {/* Preparation Hub - Disabled
       <Route
         path="/preparation-hub"
         element={
@@ -193,6 +200,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
 
       <Route
         path="/internship"
@@ -228,6 +236,7 @@ function App() {
         }
       />
 
+      {/* ATS Scanner - Disabled
       <Route
         path="/ats-scanner"
         element={
@@ -236,6 +245,8 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
+      {/* ATS Results - Disabled
       <Route
         path="/results"
         element={
@@ -244,9 +255,13 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
+      {/* Resume Builder - Disabled
       <Route path="/resume" element={<ResumeBuilder />} />
       <Route path="/land" element={<LandingPage />} />
+      */}
 
+      {/* Document Center - Disabled
       <Route
         path="/document-center"
         element={
@@ -255,8 +270,11 @@ function App() {
           </ProtectedRoute>
         }
       />
+      */}
 
+      {/* Resume From Scratch - Disabled
       <Route path="/resume-from-scratch" element={<ResumeFromScratch />} />
+      */}
     </Routes>
     </>
   );
