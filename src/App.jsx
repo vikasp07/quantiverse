@@ -63,6 +63,7 @@ import ResumeBuilder from "./components/resume_builder/ResumeBuilder";
 import DocumentCenter from "./components/document_center/DocumentCenter";
 import UserProfile from "./components/profile/UserProfile";
 import ActivityTracker from "./components/utils/ActivityTracker";
+import Homepage from "./components/Homepage";
 
 function App() {
   const { session } = UserAuth();
@@ -72,7 +73,7 @@ function App() {
       {/* Activity Tracker - tracks user activity when logged in */}
       {session?.user && <ActivityTracker />}
       <Routes>
-      <Route path="/" element={<Navigate to="/signup" replace />} />
+      <Route path="/" element={<Homepage />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/update-password" element={<UpdatePassword />} />
