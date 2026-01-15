@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -22,9 +22,9 @@ const Layout = ({ children }) => {
       {/* Sidebar - Fixed on desktop, slide-in on mobile */}
       <div
         className={`
-          fixed top-0 left-0 h-screen w-64 z-40
+          fixed top-0 left-0 h-screen w-64 z-40 lg:relative lg:z-0
           transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0
+          lg:translate-x-0 lg:transform-none
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
@@ -32,12 +32,12 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="lg:ml-64 min-h-screen flex flex-col">
+      <div className="flex-1 w-full min-h-screen flex flex-col">
         {/* Top Navbar */}
         <Navbar onMenuToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         {/* Page Content */}
-        <main className="flex-1">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>

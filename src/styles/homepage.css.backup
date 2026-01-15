@@ -1,9 +1,10 @@
 /* ============================================
    HOMEPAGE STYLING - QUANTIVERSE
+   SCOPED TO .homepage CLASS ONLY
    ============================================ */
 
-/* ============ ROOT / GLOBAL ============ */
-:root {
+/* ============ ROOT / GLOBAL - ONLY FOR HOMEPAGE ============ */
+.homepage {
   --primary: #10b981;
   --primary-dark: #059669;
   --primary-light: #6ee7b7;
@@ -22,24 +23,28 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
+.homepage * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.homepage html {
   scroll-behavior: smooth;
 }
 
-body {
+.homepage body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   color: var(--secondary);
   background-color: var(--white);
   line-height: 1.6;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .homepage {
