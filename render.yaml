@@ -8,18 +8,3 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://quantiverse-backend.onrender.com
-
-  # Backend Web Service
-  - type: web
-    name: quantiverse-backend
-    env: python
-    rootDir: ./backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
-    envVars:
-      - key: FLASK_ENV
-        value: production
-      - key: SUPABASE_URL
-        value: https://eplfwexdnkcwqdcqbgqq.supabase.co
-      - key: SUPABASE_KEY
-        value: sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9
