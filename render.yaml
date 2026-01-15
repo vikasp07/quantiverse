@@ -1,10 +1,26 @@
 services:
+  # Frontend Web Service
+  - type: web
+    name: quantiverse-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - path: /
+        destination: /index.html
+      - path: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://quantiverse-backend.onrender.com
+
+  # Backend Web Service
   - type: web
     name: quantiverse-backend
     env: python
     pythonVersion: 3.11
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: FLASK_ENV
         value: production
