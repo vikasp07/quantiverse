@@ -38,7 +38,7 @@ CORS(app,
          "origins": [
              "http://localhost:5173",
              "https://quantiverse-front.onrender.com",
-             "https://quantiverse-frontend1.onrender.com"
+             "https://quantiverse-frontend1.onrender.com"]
          "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
          "allow_headers": ["Content-Type", "Authorization"],
          "supports_credentials": True
